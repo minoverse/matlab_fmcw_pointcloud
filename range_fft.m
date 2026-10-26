@@ -1,60 +1,69 @@
-% 1. FFT
-range_spectrum = fft(adc_signal);
+%% Hann window for Range FFT
 
-% 2. Magnitude
-range_mag = abs(range_spectrum);
+n_range = (0:Ns-1)';
 
-% 3. Frequency bins
-freq_axis = (0:Ns-1) * fs / Ns;
+range_window = ...
+    0.5 - 0.5*cos(2*pi*n_range/(Ns-1));
 
-% 4. Frequency → Range
-range_axis = c * freq_axis / (2 * S);
 
-%% Range FFT
+%% Range FFT without window
 
-range_spectrum = fft(adc_signal);
+range_data_no_window = fft(adc_cube, [], 1);
 
-% Use only positive frequencies
+
+%% Apply Range Hann window
+
+adc_windowed = ...
+    adc_cube .* reshape(range_window, Ns, 1, 1);
+
+range_data = fft(adc_windowed, [], 1);
+
+
+%% Positive range bins
+
 half_N = floor(Ns / 2);
-
-range_spectrum_pos = range_spectrum(1:half_N);
-range_mag = abs(range_spectrum_pos);
-
-%% Frequency axis
 
 freq_axis = (0:half_N-1) * fs / Ns;
 
-%% Frequency -> Range
-
 range_axis = c * freq_axis / (2 * S);
 
-%% Find peak
 
-[peak_mag, peak_idx] = max(range_mag);
+%% First chirp magnitude
 
-estimated_fb = freq_axis(peak_idx);
-estimated_range = range_axis(peak_idx);
+range_mag_no_window = ...
+    abs(range_data_no_window(1:half_N, 1, 1));
 
-range_error = estimated_range - target_range;
+range_mag_window = ...
+    abs(range_data(1:half_N, 1, 1));
 
-%% Print result
 
-fprintf("\n--- Range FFT Result ---\n");
-fprintf("Ground Truth Range = %.3f m\n", target_range);
-fprintf("Estimated Beat     = %.3f MHz\n", estimated_fb / 1e6);
-fprintf("Estimated Range    = %.3f m\n", estimated_range);
-fprintf("Range Error        = %.3f m\n", range_error);
+%% Normalize for comparison
 
-%% Plot
+range_db_no_window = ...
+    20*log10(range_mag_no_window / max(range_mag_no_window) + eps);
+
+range_db_window = ...
+    20*log10(range_mag_window / max(range_mag_window) + eps);
+
+
+%% Plot before / after
 
 figure;
 
-plot(range_axis, range_mag);
+plot(range_axis, range_db_no_window);
+
+hold on;
+
+plot(range_axis, range_db_window);
 
 xlabel("Range [m]");
-ylabel("Magnitude");
-title("Range FFT");
+ylabel("Normalized Magnitude [dB]");
+
+title("Range FFT - Hann Window Comparison");
+
+legend("No Window", "Hann Window");
 
 grid on;
 
-xlim([0 60]);
+xlim([20 65]);
+ylim([-80 5]);

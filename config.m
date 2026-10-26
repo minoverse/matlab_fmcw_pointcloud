@@ -22,47 +22,55 @@ fs = 20e6;          % ADC sampling rate [Hz]
 Nchirp = 64;        % Number of chirps
 
 
-%% Ground truth target
+%% Ground truth targets
 
-target_range = 30;      % Target range [m]
-target_velocity = 10;   % Target radial velocity [m/s]
+target_range = [30, 55];          % Target ranges [m]
+target_velocity = [10, -5];       % Target radial velocities [m/s]
+target_amplitude = [1.0, 0.7];    % Relative amplitudes
+
+Ntargets = length(target_range);
 
 
 %% Derived FMCW parameters
 
-S = B / Tchirp;         % Chirp slope [Hz/s]
+S = B / Tchirp;
 
-Ns = round(fs * Tchirp);   % Number of ADC samples per chirp
+Ns = round(fs * Tchirp);
 
 range_resolution = c / (2 * B);
 
 
 %% Range-related parameters
 
-tau = 2 * target_range / c;   % Round-trip delay [s]
+tau = 2 * target_range / c;
 
-fb = S * tau;                 % Beat frequency [Hz]
+fb = S .* tau;
 
 
 %% Doppler-related parameters
 
-lambda = c / fc;              % Wavelength [m]
+lambda = c / fc;
 
-fd = 2 * target_velocity / lambda;   % Doppler frequency [Hz]
+fd = 2 * target_velocity / lambda;
 
 
 %% Print configuration
 
 fprintf("Ns = %d samples\n", Ns);
+fprintf("Range resolution = %.3f m\n", range_resolution);
 
-fprintf("Range resolution = %.3f m\n", ...
-    range_resolution);
+for k = 1:Ntargets
 
-fprintf("Round trip delay = %.3f ns\n", ...
-    tau * 1e9);
+    fprintf("\nTarget %d\n", k);
 
-fprintf("Expected beat frequency = %.3f MHz\n", ...
-    fb / 1e6);
+    fprintf("Range = %.2f m\n", target_range(k));
 
-fprintf("Expected Doppler frequency = %.3f kHz\n", ...
-    fd / 1e3);
+    fprintf("Velocity = %.2f m/s\n", target_velocity(k));
+
+    fprintf("Beat frequency = %.3f MHz\n", ...
+        fb(k) / 1e6);
+
+    fprintf("Doppler frequency = %.3f kHz\n", ...
+        fd(k) / 1e3);
+
+end
