@@ -1,7 +1,9 @@
+
 clear;
 clc;
 close all;
 
+addpath(genpath("src"));
 set(groot, "defaultFigureVisible", "on");
 
 run("config.m");
