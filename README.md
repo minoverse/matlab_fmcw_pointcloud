@@ -50,18 +50,17 @@ CSV / Text
 
 현재 단계:
 
-```text
-Multiple Targets + Noise   ✅
-Range FFT                  ✅
-Doppler FFT                ✅
-Hann Windowing             ✅
-2D CA-CFAR                 ← CURRENT
-Peak Grouping
-1TX × 4RX AoA
-Point Cloud
-Ground-Truth Validation
-Optimization v2
-```
+Multiple Targets + Noise        ✅
+Range FFT + Hann Windowing      ✅
+Doppler FFT                     ✅
+2D CA-CFAR + Peak Grouping      ✅
+Static / DC Handling            ✅
+1TX × 4RX AoA                   ✅
+Point Cloud + CSV               ✅
+Ground-Truth Validation         ✅
+Basic Robustness Tests          ✅
+Near-Zero Velocity Trade-Off    ✅
+Optimization v2                 ← NEXT
 
 ---
 
