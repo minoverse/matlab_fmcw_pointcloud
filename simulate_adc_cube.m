@@ -1,59 +1,49 @@
 %% Fast-time axis
-
 n = 0:Ns-1;
 t_fast = n / fs;
 
-
 %% ADC cube
-% Dimension 1 = Fast Time samples
-% Dimension 2 = RX channels
-% Dimension 3 = Chirps / Slow Time
-
-Nrx = 1;
-
 adc_cube = complex(zeros(Ns, Nrx, Nchirp));
 
-
-%% Generate multiple target beat signals
-
+%% Generate target signals
 for m = 0:Nchirp-1
 
-    chirp_signal = complex(zeros(1, Ns));
+    for rx = 1:Nrx
 
-    for k = 1:Ntargets
+        rx_signal = complex(zeros(1, Ns));
 
-        fast_phase = 2*pi * fb(k) * t_fast;
+        for k = 1:Ntargets
 
-        slow_phase = 2*pi * fd(k) * m * Tchirp;
+            fast_phase = 2*pi * fb(k) * t_fast;
 
-        target_signal = target_amplitude(k) * ...
-            exp(1j * (fast_phase + slow_phase));
+            slow_phase = 2*pi * fd(k) * m * Tchirp;
 
-        chirp_signal = chirp_signal + target_signal;
+            spatial_phase = 2*pi * (d_rx / lambda) * (rx - 1) * sind(target_angle(k));
+
+            target_signal = target_amplitude(k) * exp(1j * (fast_phase + slow_phase + spatial_phase));
+
+            rx_signal = rx_signal + target_signal;
+
+        end
+
+        adc_cube(:, rx, m+1) = rx_signal.';
 
     end
 
-    adc_cube(:, 1, m+1) = chirp_signal.';
-
 end
 
-
 %% Add complex Gaussian noise
-
 snr_db = 20;
 
 signal_power = max(target_amplitude)^2;
 
 noise_power = signal_power / (10^(snr_db / 10));
 
-noise = sqrt(noise_power / 2) * ...
-    (randn(size(adc_cube)) + 1j * randn(size(adc_cube)));
+noise = sqrt(noise_power / 2) * (randn(size(adc_cube)) + 1j * randn(size(adc_cube)));
 
 adc_cube = adc_cube + noise;
 
-
-%% Plot first chirp I/Q
-
+%% Plot first chirp from RX1
 adc_signal = adc_cube(:, 1, 1).';
 
 figure;
@@ -69,6 +59,6 @@ ylabel("Amplitude");
 
 legend("I", "Q");
 
-title("First Chirp IQ Signal - Multiple Targets");
+title("First Chirp IQ Signal");
 
 grid on;
