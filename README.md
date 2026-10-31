@@ -338,38 +338,30 @@ Optimization 전에 Baseline 정확성을 먼저 확인.
 
 # Optimization v2
 
-## 10. Detection-Centric Sparse Processing
+## 10. Embedded Sparse DSP Optimization
 
-핵심 아이디어:
-
-```text
-Dense Processing
-       ↓
-Low-Cost Candidate Selection
-       ↓
-필요한 영역만 처리
-       ↓
-Sparse Processing
-```
+Dense Range Processing
+        ↓
+Lightweight Early Gating
+        ↓
+Candidate Range Bins
+        ↓
+Selective Downstream Processing
+        ↓
+Sparse Point Cloud
 
 목표:
 
-```text
+Unnecessary Processing ↓
 Compute ↓
-Memory ↓
+Memory Footprint ↓
 Data Movement ↓
-```
 
 동시에:
 
-```text
-Pd / Pfa
-Range / Velocity / Angle Accuracy
-```
-
-가 얼마나 유지되는지 측정.
-
----
+Detection Performance 유지
+Weak-Target Miss 최소화
+Range / Velocity / Angle Accuracy 유지
 
 ## 11. Optimization Architecture
 
