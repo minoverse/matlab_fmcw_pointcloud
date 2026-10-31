@@ -1,11 +1,7 @@
 # FMCW Radar DSP with Detection-Centric Sparse Processing
 
 핵심 목표:
-
-- Synthetic ADC → Point Cloud 전체 파이프라인 구현
-- Range / Doppler / CFAR / AoA 직접 구현 및 검증
-- Dense processing → Detection-Centric Sparse Processing
-- 연산량, 메모리, 데이터 이동량 감소
+-FMCW radar DSP 전체 파이프라인을 직접 구현·검증한 뒤, lightweight pre-filtering / candidate gating으로 불필요한 downstream processing을 조기에 제거하고, 연산량·메모리·데이터 이동량을 줄여 embedded real-time 환경에 적합하게 최적화
 - 절감률과 검출 성능 손실의 trade-off 분석
 
 ---
