@@ -339,7 +339,7 @@ Optimization 전에 Baseline 정확성을 먼저 확인.
 # Optimization v2
 
 ## 10. Embedded Sparse DSP Optimization
-
+```text
 Dense Range Processing
         ↓
 Lightweight Early Gating
@@ -349,14 +349,15 @@ Candidate Range Bins
 Selective Downstream Processing
         ↓
 Sparse Point Cloud
-
+```
+```text
 목표:
 
 Unnecessary Processing ↓
 Compute ↓
 Memory Footprint ↓
 Data Movement ↓
-
+```
 동시에:
 
 Detection Performance 유지
