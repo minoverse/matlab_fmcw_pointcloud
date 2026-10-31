@@ -1,4 +1,4 @@
-%% Build Point Cloud
+%% Build 3D Point Cloud
 
 Npoints = length(peak_range_idx);
 
@@ -10,49 +10,85 @@ x = zeros(Npoints, 1);
 
 y = zeros(Npoints, 1);
 
+z = zeros(Npoints, 1);
+
+
 for i = 1:Npoints
 
     detected_range(i) = range_axis(peak_range_idx(i));
 
     detected_velocity(i) = velocity_axis(peak_doppler_idx(i));
 
-    x(i) = detected_range(i) * cosd(estimated_angles(i));
 
-    y(i) = detected_range(i) * sind(estimated_angles(i));
+    range_value = detected_range(i);
+
+    azimuth = estimated_azimuth(i);
+
+    elevation = estimated_elevation(i);
+
+
+    x(i) = range_value * cosd(elevation) * cosd(azimuth);
+
+    y(i) = range_value * cosd(elevation) * sind(azimuth);
+
+    z(i) = range_value * sind(elevation);
 
 end
 
-pointcloud = table(x, y, detected_range, detected_velocity, estimated_angles, estimated_snr);
 
-pointcloud.Properties.VariableNames = {'x', 'y', 'range', 'radial_velocity', 'angle', 'snr'};
-fprintf("\n--- Point Cloud ---\n");
+%% Point cloud table
+
+pointcloud = table(x, y, z, detected_range, detected_velocity, estimated_azimuth, estimated_elevation, estimated_snr);
+
+
+pointcloud.Properties.VariableNames = {'x', 'y', 'z', 'range', 'radial_velocity', 'azimuth', 'elevation', 'snr'};
+
+
+fprintf("\n--- 3D Point Cloud ---\n");
 
 disp(pointcloud);
 
+
 %% CSV
+
 if ~exist("output", "dir")
+
     mkdir("output");
+
 end
+
 
 writetable(pointcloud, "output/pointcloud.csv");
 
+
 %% Plot
+
 figure;
 
-scatter(x, y, 70, "filled");
+scatter3(x, y, z, 80, "filled");
 
 xlabel("Forward x [m]");
 
 ylabel("Lateral y [m]");
 
-title("Radar Point Cloud");
+zlabel("Height z [m]");
+
+title("Radar 3D Point Cloud");
 
 grid on;
 
 axis equal;
 
+view(3);
+
+
+%% Save
+
 if ~exist("plots/06_pointcloud", "dir")
+
     mkdir("plots/06_pointcloud");
+
 end
+
 
 exportgraphics(gcf, "plots/06_pointcloud/pointcloud.png", "Resolution", 300);

@@ -2,22 +2,31 @@ clear;
 clc;
 close all;
 
+project_root = fileparts(fileparts(mfilename("fullpath")));
+cd(project_root);
+
+addpath(genpath("src"));
+addpath("tests");
+
 %% Choose test
+
 % 1 = Weak Target
 % 2 = Close Targets
 % 3 = Static Clutter
 % 4 = RX Gain / Phase Mismatch
 % 5 = Near-Zero Velocity
+% 6 = Elevation Check
 
-test_case = 5;
+test_case = 6;
 
-%% Test 5 setting
-% false = notch OFF
-% true  = notch ON
+
+%% Near-zero setting
 
 near_zero_notch = true;
 
+
 run("config.m");
+
 
 apply_clutter_removal = false;
 
@@ -36,8 +45,13 @@ end
 if test_case == 2
 
     target_range = [30, 30.45];
+
     target_velocity = [10, 10];
+
     target_angle = [15, -20];
+
+    target_elevation = [10, -8];
+
     target_amplitude = [1.0, 0.7];
 
 end
@@ -48,8 +62,13 @@ end
 if test_case == 3
 
     target_range = [30, 55, 20];
+
     target_velocity = [10, -5, 0];
+
     target_angle = [15, -20, 0];
+
+    target_elevation = [10, -8, 0];
+
     target_amplitude = [1.0, 0.7, 2.0];
 
     apply_clutter_removal = true;
@@ -62,11 +81,25 @@ end
 if test_case == 5
 
     target_range = [30, 55, 40];
+
     target_velocity = [10, -5, 0.6];
+
     target_angle = [15, -20, 0];
+
+    target_elevation = [10, -8, 5];
+
     target_amplitude = [1.0, 0.7, 1.0];
 
     apply_clutter_removal = near_zero_notch;
+
+end
+
+
+%% Test 6 - Elevation Check
+
+if test_case == 6
+
+    target_elevation = [20, -15];
 
 end
 
@@ -94,6 +127,7 @@ if test_case == 4
     rx_gain = [1.0, 0.9, 1.1, 0.85];
 
     rx_phase = [0, 8, -5, 12];
+
 
     for rx = 1:Nrx
 
@@ -125,29 +159,34 @@ run("build_pointcloud.m");
 run("validate_ground_truth.m");
 
 
-%% Save robustness result
+%% Save
 
 if ~exist("plots/robustness", "dir")
+
     mkdir("plots/robustness");
+
 end
+
 
 if ~exist("output", "dir")
+
     mkdir("output");
+
 end
 
-
-%% Save Test 5 separately for notch OFF / ON
 
 if test_case == 5
 
     if near_zero_notch
 
         filename = "plots/robustness/test_5_notch_on_pointcloud.png";
+
         csv_name = "output/robustness_test_5_notch_on.csv";
 
     else
 
         filename = "plots/robustness/test_5_notch_off_pointcloud.png";
+
         csv_name = "output/robustness_test_5_notch_off.csv";
 
     end
@@ -155,6 +194,7 @@ if test_case == 5
 else
 
     filename = "plots/robustness/test_" + test_case + "_pointcloud.png";
+
     csv_name = "output/robustness_test_" + test_case + ".csv";
 
 end
