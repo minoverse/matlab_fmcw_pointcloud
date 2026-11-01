@@ -1,0 +1,33 @@
+=== Phase 2: Baseline Cost and Pre-Doppler ROI Validation ===
+
+[ROI Candidate Selection]
+Threshold = 6.00 dB
+Selected range bins = 9 / 500
+Selected fraction = 1.80%
+Target 1 ROI selected = 1
+Target 2 ROI selected = 1
+
+[Range FFT Baseline]
+DSP Range FFT count = 256
+Diagnostic Range FFT count = 256
+
+[Doppler FFT Workload]
+Current Dense FFT count = 4000
+Fair Dense FFT count = 2000
+Projected Sparse FFT count = 36
+Projected Doppler FFT work reduction = 98.20%
+
+[CFAR Baseline]
+Training cells = 216
+CFAR CUT count = 25920
+Training accesses = 5598720
+
+[Validation]
+Target ROI validation = PASS
+ROI reduction validation = PASS
+Baseline counter validation = PASS
+Overall = PASS
+
+[Note]
+Sparse Doppler cost is a workload projection only.
+No measured CPU latency or power reduction is claimed.

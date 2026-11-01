@@ -1,0 +1,38 @@
+=== Phase 2 Group 3A: ROI-Only CFAR ===
+
+[Selected ROI]
+Original ROI bins = 9 / 500
+ROI + CFAR margin bins = 49 / 500
+CFAR range margin = 10 bins per side
+Fair Dense Doppler FFT count = 2000
+Sparse FFT count with margin = 196
+Doppler FFT workload reduction vs Fair Dense = 90.20%
+
+[ROI-Only CFAR]
+Training cells = 216
+Dense CFAR CUTs = 25920
+ROI CFAR CUTs = 486
+ROI CFAR workload reduction = 98.12%
+ROI detected cells = 15
+ROI grouped peaks = 2
+
+[Selected ROI Regression]
+Maximum FFT difference = 0.000e+00
+Maximum RD power difference = 0.000e+00
+Maximum CFAR noise difference = 0.000e+00
+FFT / RD / CFAR / Peak regression = PASS
+
+[Full ROI Regression]
+Full ROI bins = 500
+Full ROI CFAR CUTs = 25920
+Full ROI detected cells = 15
+Full ROI regression = PASS
+
+[Notes]
+Margin FFT workload is included in the sparse cost.
+CFAR detections are evaluated at ROI CUTs only.
+Full ROI regression verifies equality with Dense.
+Dense RD background is used only for plotting.
+No real latency or power reduction is claimed.
+
+Overall = PASS

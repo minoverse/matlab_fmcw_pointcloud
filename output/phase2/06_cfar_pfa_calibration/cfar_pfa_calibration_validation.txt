@@ -1,0 +1,43 @@
+=== Phase 2 Group 3C-2: CFAR Pfa Calibration ===
+
+[CFAR Settings]
+Nominal Pfa = 1.000000e-05
+Training cells = 216
+Valid CUTs per trial = 25920
+Original alpha = 11.825273
+
+[Ideal Independent 1-RX Test]
+Trials = 200
+Expected false alarms = 51.84
+Observed false alarms = 38
+Empirical Pfa = 7.330247e-06
+Ideal formula check = PASS
+
+[Actual FFT 1-RX Diagnostic]
+Trials = 200
+Observed false alarms = 111
+Empirical Pfa = 2.141204e-05
+
+[4-RX Calibration]
+Calibration trials = 200
+Selected alpha = 4.800000
+Calibration false alarms = 55
+Calibration empirical Pfa = 1.060957e-05
+
+[Independent 4-RX Validation]
+Validation trials = 300
+Total CUT observations = 7776000
+Nominal expected false alarms = 77.76
+Original alpha false alarms = 0
+Original alpha empirical Pfa = 0.000000e+00
+Calibrated alpha false alarms = 78
+Calibrated empirical Pfa = 1.003086e-05
+Acceptance range = 5.000000e-06 to 1.500000e-05
+Calibration validation = PASS
+
+[Notes]
+Ideal test uses independent exponential power samples.
+Actual 4-RX test uses Range FFT, Doppler FFT, Hann windows and RX power summation.
+Calibration and validation use separate noise realizations.
+Acceptance range is an exploratory engineering tolerance, not a formal confidence interval.
+The original CFAR implementation is not modified by this test.

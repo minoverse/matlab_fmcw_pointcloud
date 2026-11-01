@@ -1,0 +1,96 @@
+=== Phase 2 Group 3C: Noise-Only Monte Carlo Pfa ===
+
+[Experiment]
+Trials = 100
+Noise power = 0.010000
+Nominal CFAR Pfa = 1.000e-05
+Training cells = 216
+Dense valid CUTs per trial = 25920
+Total Dense CUT observations = 2592000
+
+[Dense CFAR]
+Observed false alarms = 0
+Empirical Pfa = 0.000000e+00
+Nominal-model expected false alarms = 25.92
+
+[Sparse ROI Threshold Sweep]
+
+Threshold = 0.00 dB
+Mean ROI bins = 250.00
+Mean expanded bins = 499.93
+Mean projected Sparse FFTs = 1999.72
+Mean CFAR CUTs = 12938.94
+Sparse false alarms = 0
+Sparse Pfa over full grid = 0.000000e+00
+Sparse Pfa over evaluated CUTs = 0.000000e+00
+Empty ROI trials = 0
+Projected FFT workload reduction = 0.01%
+CFAR CUT reduction = 50.08%
+
+Threshold = 0.50 dB
+Mean ROI bins = 15.33
+Mean expanded bins = 212.36
+Mean projected Sparse FFTs = 849.44
+Mean CFAR CUTs = 786.78
+Sparse false alarms = 0
+Sparse Pfa over full grid = 0.000000e+00
+Sparse Pfa over evaluated CUTs = 0.000000e+00
+Empty ROI trials = 0
+Projected FFT workload reduction = 57.53%
+CFAR CUT reduction = 96.96%
+
+Threshold = 1.00 dB
+Mean ROI bins = 0.02
+Mean expanded bins = 0.42
+Mean projected Sparse FFTs = 1.68
+Mean CFAR CUTs = 1.08
+Sparse false alarms = 0
+Sparse Pfa over full grid = 0.000000e+00
+Sparse Pfa over evaluated CUTs = 0.000000e+00
+Empty ROI trials = 98
+Projected FFT workload reduction = 99.92%
+CFAR CUT reduction = 100.00%
+
+Threshold = 3.00 dB
+Mean ROI bins = 0.00
+Mean expanded bins = 0.00
+Mean projected Sparse FFTs = 0.00
+Mean CFAR CUTs = 0.00
+Sparse false alarms = 0
+Sparse Pfa over full grid = 0.000000e+00
+Sparse Pfa over evaluated CUTs = NaN
+Empty ROI trials = 100
+Projected FFT workload reduction = 100.00%
+CFAR CUT reduction = 100.00%
+
+Threshold = 6.00 dB
+Mean ROI bins = 0.00
+Mean expanded bins = 0.00
+Mean projected Sparse FFTs = 0.00
+Mean CFAR CUTs = 0.00
+Sparse false alarms = 0
+Sparse Pfa over full grid = 0.000000e+00
+Sparse Pfa over evaluated CUTs = NaN
+Empty ROI trials = 100
+Projected FFT workload reduction = 100.00%
+CFAR CUT reduction = 100.00%
+
+[Validation]
+Dense CFAR spot-check = PASS
+Sparse CFAR regression = PASS
+ROI monotonicity = PASS
+False alarm subset property = PASS
+Workload bounds = PASS
+Overall code validation = PASS
+
+[Limitations]
+All inputs are noise only. No target signals are present.
+Sparse full-grid Pfa includes skipped CUTs as non-detections.
+Sparse evaluated-CUT Pfa is NaN if no CUTs were evaluated.
+A zero sparse false-alarm count can result from an empty ROI.
+Sparse Monte Carlo detections use Dense CFAR restricted to ROI CUTs.
+An actual Sparse CFAR regression is checked on one trial.
+The CFAR scale assumes independent exponential power samples.
+Current 4-RX power summation and windowing can change empirical Pfa.
+Pfa is measured, not required to equal its nominal setting.
+Workload counters are not CPU latency or power measurements.

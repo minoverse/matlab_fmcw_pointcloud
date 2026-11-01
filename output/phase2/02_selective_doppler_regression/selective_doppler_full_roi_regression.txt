@@ -1,0 +1,31 @@
+=== Phase 2 Group 2: Selective Doppler and Regression ===
+
+[Selective Doppler Test]
+Selected range bins = 9 / 500
+Current Dense FFT count = 4000
+Fair Dense FFT count = 2000
+Selective Doppler FFT count = 36
+Maximum selected FFT difference = 0.000e+00
+Maximum selected RD power difference = 0.000e+00
+FFT workload reduction vs Fair Dense = 98.20%
+
+[Full ROI Regression]
+Full ROI range bins = 500
+Maximum FFT difference = 0.000e+00
+Maximum RD power difference = 0.000e+00
+Complex FFT match = 1
+RD power match = 1
+CFAR detection match = 1
+Peak grouping match = 1
+Dense CFAR detected cells = 15
+
+[Validation]
+Selected ROI FFT correctness = PASS
+Full ROI regression = PASS
+Overall = PASS
+
+[Notes]
+Selective FFT processing uses ROI bins only.
+Full ROI regression uses all positive range bins.
+ROI-only CFAR is not implemented yet.
+Workload reduction is not a latency or power measurement.

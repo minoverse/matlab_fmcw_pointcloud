@@ -1,0 +1,120 @@
+=== Group 3D: Calibrated CFAR Detection Validation ===
+
+Trials per amplitude = 200
+Noise SNR = 20.0 dB
+Original alpha = 11.825273
+Calibrated alpha = 4.800000
+ROI thresholds = 3 and 6 dB
+Target matching = +/-1 range bin and +/-1 Doppler bin
+
+[Target 2 amplitude = 0.700]
+
+ROI threshold = 3.0 dB
+Mean ROI bins = 10.99
+Mean expanded bins = 50.99
+Mean Sparse Doppler FFTs = 203.98
+Alpha = 11.825273
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 1.00
+Off-target Sparse cells per trial = 1.00
+Alpha = 4.800000
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 1.21
+Off-target Sparse cells per trial = 1.00
+
+ROI threshold = 6.0 dB
+Mean ROI bins = 9.00
+Mean expanded bins = 49.00
+Mean Sparse Doppler FFTs = 196.00
+Alpha = 11.825273
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 1.00
+Off-target Sparse cells per trial = 1.00
+Alpha = 4.800000
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 1.21
+Off-target Sparse cells per trial = 1.00
+
+[Target 2 amplitude = 0.030]
+
+ROI threshold = 3.0 dB
+Mean ROI bins = 6.00
+Mean expanded bins = 46.00
+Mean Sparse Doppler FFTs = 184.00
+Alpha = 11.825273
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 0.06
+Off-target Sparse cells per trial = 0.00
+Alpha = 4.800000
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 1.25
+Off-target Sparse cells per trial = 0.01
+
+ROI threshold = 6.0 dB
+Mean ROI bins = 6.00
+Mean expanded bins = 46.00
+Mean Sparse Doppler FFTs = 184.00
+Alpha = 11.825273
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 0.06
+Off-target Sparse cells per trial = 0.00
+Alpha = 4.800000
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 1.25
+Off-target Sparse cells per trial = 0.01
+
+[Target 2 amplitude = 0.005]
+
+ROI threshold = 3.0 dB
+Mean ROI bins = 4.21
+Mean expanded bins = 44.22
+Mean Sparse Doppler FFTs = 176.86
+Alpha = 11.825273
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 0.00
+Off-target Sparse cells per trial = 0.00
+Alpha = 4.800000
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 100.00%
+Off-target Dense cells per trial = 0.23
+Off-target Sparse cells per trial = 0.00
+
+ROI threshold = 6.0 dB
+Mean ROI bins = 3.00
+Mean expanded bins = 23.00
+Mean Sparse Doppler FFTs = 92.00
+Alpha = 11.825273
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 0.00%
+Off-target Dense cells per trial = 0.00
+Off-target Sparse cells per trial = 0.00
+Alpha = 4.800000
+Dense Target 2 hit rate = 100.00%
+Sparse Target 2 hit rate = 0.00%
+Off-target Dense cells per trial = 0.23
+Off-target Sparse cells per trial = 0.00
+
+[Validation]
+Selective FFT and CFAR spot-check = PASS
+Sparse detection subset of Dense = PASS
+Calibrated alpha detection monotonicity = PASS
+Workload counter validation = PASS
+Overall code validation = PASS
+
+[Limitations]
+Sparse detections use Dense CFAR decisions restricted to ROI CUTs.
+Actual Sparse FFT and CFAR are spot-checked on one trial.
+Target hits use local ground-truth matching windows.
+Off-target cells may contain target sidelobes and are not pure-noise false alarms.
+Noise-only Pfa was validated separately in Group 3C-2.
+The original CFAR implementation is not modified.
+FFT reduction is a workload proxy, not measured latency or power.

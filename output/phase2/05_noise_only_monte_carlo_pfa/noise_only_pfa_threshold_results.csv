@@ -1,0 +1,6 @@
+Threshold_dB,Trials,DenseFalseAlarms,DenseEmpiricalPfa,SparseFalseAlarms,SparseFullGridPfa,SparseEvaluatedCutPfa,MeanROIBins,MeanExpandedBins,MeanProjectedSparseFFTs,MeanSparseCFARCUTs,ProjectedFFTReduction_pct,CFARCutReduction_pct,EmptyROITrials,TotalSparseEvaluatedCUTs
+0,100,0,0,0,0,0,250,499.93,1999.72,12938.94,0.0140000000000029,50.08125,0,1293894
+0.5,100,0,0,0,0,0,15.33,212.36,849.44,786.78,57.528,96.9645833333333,0,78678
+1,100,0,0,0,0,0,0.02,0.42,1.68,1.08,99.916,99.9958333333333,98,108
+3,100,0,0,0,0,NaN,0,0,0,0,100,100,100,0
+6,100,0,0,0,0,NaN,0,0,0,0,100,100,100,0
