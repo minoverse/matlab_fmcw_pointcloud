@@ -1,0 +1,18 @@
+=== Group 5D: Fair CFAR Data Access Comparison ===
+
+Scene: SNR 20 dB, amplitude 0.005, ROI 3 dB, Top-K 6, cap 200
+Actual sparse Doppler FFTs = 176
+Selected CUTs = 216
+Naive CFAR model access reduction = 80.77%
+Equal-method integral-image model access reduction = 29.46%
+Dense prefix-model logical access = 14.4751 MiB
+Sparse prefix-model logical access = 10.2101 MiB
+Dense/sparse FFT and integral CFAR regression = PASS
+
+[Limitations]
+Model: two prefix passes (read/write), 8 window-corner reads plus 1 CUT read.
+Both Dense and Sparse use the same integral-image cost model.
+Real CFAR kernels may use sliding sums, vectorization, caching, or tiling.
+ROI median, sorting, scheduling and block merge computation are not counted.
+MATLAB allocations and true physical bus bytes/latency are not measured.
+A modeled reduction is NOT an upper bound on all hardware implementations.

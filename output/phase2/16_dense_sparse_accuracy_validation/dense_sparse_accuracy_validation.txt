@@ -1,0 +1,23 @@
+=== Group 5E: Actual Dense vs Sparse Accuracy Validation ===
+Independent trials per SNR scenario = 30
+Target events per scenario = 60
+Common-detection maximum estimate difference = 0.000e+00
+CFAR alpha = 11.825273 (original nominal, not calibrated 4.8)
+Matching tolerance = +/-1 range bin and +/-1 Doppler bin, strongest unused 3x3 peak
+
+20dB ROI3 | Dense | matched 60/60 | missed 0 | common 60 | Range 0.0354 m | Velocity 0.2053 m/s | Az 1.2407 deg | El 1.2968 deg
+20dB ROI3 | Balanced Sparse (actual FFT/CFAR) | matched 60/60 | missed 0 | common 60 | Range 0.0354 m | Velocity 0.2053 m/s | Az 1.2407 deg | El 1.2968 deg
+20dB ROI6 | Dense | matched 60/60 | missed 0 | common 30 | Range 0.0000 m | Velocity 0.2597 m/s | Az 0.2989 deg | El 0.1031 deg
+20dB ROI6 | Balanced Sparse (actual FFT/CFAR) | matched 30/60 | missed 30 | common 30 | Range 0.0000 m | Velocity 0.2597 m/s | Az 0.2989 deg | El 0.1031 deg
+10dB ROI3 | Dense | matched 30/60 | missed 30 | common 30 | Range 0.0000 m | Velocity 0.2597 m/s | Az 0.2989 deg | El 0.1031 deg
+10dB ROI3 | Balanced Sparse (actual FFT/CFAR) | matched 30/60 | missed 30 | common 30 | Range 0.0000 m | Velocity 0.2597 m/s | Az 0.2989 deg | El 0.1031 deg
+
+[Limitations]
+Actual Sparse Doppler FFT and ROI CFAR run on the same simulated scene as Dense.
+Conditional RMSE is calculated only for matched targets and must be read together with misses.
+Ground truth is assigned using a +/-1-bin local peak rule; low-SNR noise hits are possible.
+One-to-one matching selects the strongest available peak within each target window.
+This test does not measure hardware latency, energy or overall Pd.
+No figures created. Group 5C remains separate mask-based statistical analysis.
+
+Overall code validation = PASS
