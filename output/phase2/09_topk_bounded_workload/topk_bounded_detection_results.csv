@@ -1,0 +1,17 @@
+Target2Amplitude,ROIThreshold_dB,TopKLimit,FFTCap,CandidateROIBins,SelectedROIBins,DroppedROIBins,ProcessingBlocks,ExpandedRangeBins,ActualDopplerFFTs,FFTWorkloadReduction_pct,CFARCUTs,CFARDetectionCells,DenseTarget1Hit,DenseTarget2Hit,BoundedTarget1Hit,BoundedTarget2Hit,Profile
+0.7,3,3,100,11,3,8,1,23,92,95.4,162,6,1,1,1,0,Strict
+0.7,3,6,200,11,6,5,2,46,184,90.8,324,14,1,1,1,1,Balanced
+0.7,3,12,400,11,11,0,2,51,204,89.8,594,15,1,1,1,1,Relaxed
+0.7,3,500,2000,11,11,0,2,51,204,89.8,594,15,1,1,1,1,Unbounded
+0.7,6,3,100,9,3,6,1,23,92,95.4,162,6,1,1,1,0,Strict
+0.7,6,6,200,9,6,3,2,46,184,90.8,324,14,1,1,1,1,Balanced
+0.7,6,12,400,9,9,0,2,49,196,90.2,486,15,1,1,1,1,Relaxed
+0.7,6,500,2000,9,9,0,2,49,196,90.2,486,15,1,1,1,1,Unbounded
+0.005,3,3,100,5,3,2,1,23,92,95.4,162,6,1,1,1,0,Strict
+0.005,3,6,200,5,5,0,2,45,180,91,270,10,1,1,1,1,Balanced
+0.005,3,12,400,5,5,0,2,45,180,91,270,10,1,1,1,1,Relaxed
+0.005,3,500,2000,5,5,0,2,45,180,91,270,10,1,1,1,1,Unbounded
+0.005,6,3,100,3,3,0,1,23,92,95.4,162,6,1,1,1,0,Strict
+0.005,6,6,200,3,3,0,1,23,92,95.4,162,6,1,1,1,0,Balanced
+0.005,6,12,400,3,3,0,1,23,92,95.4,162,6,1,1,1,0,Relaxed
+0.005,6,500,2000,3,3,0,1,23,92,95.4,162,6,1,1,1,0,Unbounded

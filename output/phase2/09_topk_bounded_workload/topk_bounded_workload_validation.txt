@@ -1,0 +1,51 @@
+=== Group 4B: Top-K and Bounded Workload Control ===
+
+[Settings]
+CFAR range margin = 10
+Fair Dense Doppler FFTs = 2000
+CFAR alpha = 11.825273
+Scene amplitudes = 0.7 and 0.005
+ROI thresholds = 3 and 6 dB
+Profiles = Strict, Balanced, Relaxed, Unbounded
+
+[Real Scene Tests]
+Amplitude 0.700 | ROI 3.0 dB | Strict | Candidates 11 | Selected 3 | FFTs 92/100 | Dense T2 1 | Bounded T2 0
+Amplitude 0.700 | ROI 3.0 dB | Balanced | Candidates 11 | Selected 6 | FFTs 184/200 | Dense T2 1 | Bounded T2 1
+Amplitude 0.700 | ROI 3.0 dB | Relaxed | Candidates 11 | Selected 11 | FFTs 204/400 | Dense T2 1 | Bounded T2 1
+Amplitude 0.700 | ROI 3.0 dB | Unbounded | Candidates 11 | Selected 11 | FFTs 204/2000 | Dense T2 1 | Bounded T2 1
+Amplitude 0.700 | ROI 6.0 dB | Strict | Candidates 9 | Selected 3 | FFTs 92/100 | Dense T2 1 | Bounded T2 0
+Amplitude 0.700 | ROI 6.0 dB | Balanced | Candidates 9 | Selected 6 | FFTs 184/200 | Dense T2 1 | Bounded T2 1
+Amplitude 0.700 | ROI 6.0 dB | Relaxed | Candidates 9 | Selected 9 | FFTs 196/400 | Dense T2 1 | Bounded T2 1
+Amplitude 0.700 | ROI 6.0 dB | Unbounded | Candidates 9 | Selected 9 | FFTs 196/2000 | Dense T2 1 | Bounded T2 1
+Amplitude 0.005 | ROI 3.0 dB | Strict | Candidates 5 | Selected 3 | FFTs 92/100 | Dense T2 1 | Bounded T2 0
+Amplitude 0.005 | ROI 3.0 dB | Balanced | Candidates 5 | Selected 5 | FFTs 180/200 | Dense T2 1 | Bounded T2 1
+Amplitude 0.005 | ROI 3.0 dB | Relaxed | Candidates 5 | Selected 5 | FFTs 180/400 | Dense T2 1 | Bounded T2 1
+Amplitude 0.005 | ROI 3.0 dB | Unbounded | Candidates 5 | Selected 5 | FFTs 180/2000 | Dense T2 1 | Bounded T2 1
+Amplitude 0.005 | ROI 6.0 dB | Strict | Candidates 3 | Selected 3 | FFTs 92/100 | Dense T2 1 | Bounded T2 0
+Amplitude 0.005 | ROI 6.0 dB | Balanced | Candidates 3 | Selected 3 | FFTs 92/200 | Dense T2 1 | Bounded T2 0
+Amplitude 0.005 | ROI 6.0 dB | Relaxed | Candidates 3 | Selected 3 | FFTs 92/400 | Dense T2 1 | Bounded T2 0
+Amplitude 0.005 | ROI 6.0 dB | Unbounded | Candidates 3 | Selected 3 | FFTs 92/2000 | Dense T2 1 | Bounded T2 0
+
+[Synthetic Stress]
+Candidate densities = 9
+FFT cap settings = 5
+Total stress cases = 45
+
+[Validation]
+Top-K hard limit = PASS
+Actual Doppler FFT hard limit = PASS
+CFAR margin coverage = PASS
+Dense vs Block FFT regression = PASS
+Dense vs Bounded CFAR regression = PASS
+Dense vs Bounded peak grouping = PASS
+Empty and full budget tests = PASS
+Overall code validation = PASS
+
+[Limitations]
+ROI ranking uses noncoherent range energy only.
+Greedy ranking is not guaranteed to preserve weak targets.
+Weak target test uses one noise realization per scene.
+Synthetic stress tests verify selection counters, not measured FFT execution.
+Doppler FFT budget excludes Range FFT, CFAR and AoA workload.
+FFT reduction is a workload proxy, not measured latency or power.
+The original CFAR implementation is unchanged.

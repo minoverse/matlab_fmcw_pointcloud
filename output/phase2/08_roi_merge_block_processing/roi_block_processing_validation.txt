@@ -1,0 +1,48 @@
+=== Phase 2 Group 4A: ROI Merge and Block Processing ===
+
+[ROI Merge]
+Original ROI bins = 9
+CFAR range margin = 10
+Merged block count = 2
+Naive expanded bin slots = 189
+Unique processing bins = 49
+Duplicate slots removed vs naive = 140
+
+[Block Doppler]
+Fair Dense FFT count = 2000
+Block Doppler FFT count = 196
+Doppler FFT workload reduction = 90.20%
+
+[ROI CFAR]
+Dense CFAR CUTs = 25920
+ROI CFAR CUTs = 486
+CFAR CUT workload reduction = 98.12%
+Dense ROI detections = 15
+Block ROI detections = 15
+
+[Logical Buffer Proxies]
+Largest block bins = 26
+Largest block input = 0.1016 MiB
+Collected FFT output = 0.1914 MiB
+
+[Regression]
+Selected FFT error = 0.000e+00
+Selected RD power error = 0.000e+00
+Selected CFAR noise error = 0.000e+00
+Full ROI FFT error = 0.000e+00
+Full ROI RD power error = 0.000e+00
+Overlapping ROI merge = PASS
+Adjacent ROI merge = PASS
+Edge ROI merge = PASS
+Empty ROI handling = PASS
+Full ROI regression = PASS
+Selected ROI regression = PASS
+Overall = PASS
+
+[Limitations]
+Group 3A already removes duplicate bins using a mask.
+Block merging is not an additional FFT saving over Group 3A.
+FFT processing is grouped by contiguous range block.
+All block outputs are still collected for ROI CFAR.
+Buffer sizes are logical proxies, not measured peak RAM.
+No CPU latency, DMA or power improvement is claimed.

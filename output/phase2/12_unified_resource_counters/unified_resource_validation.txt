@@ -1,0 +1,48 @@
+=== Group 5A: Unified Resource Counters ===
+
+[Workload Settings]
+Range FFT size = 1000
+Doppler FFT size = 64
+RX channels = 4
+DSP Range FFT count = 256
+Fair Dense Doppler FFT count = 2000
+CFAR training cells = 216
+Fair Dense CFAR CUTs = 25920
+
+[Input Results]
+Group 4B configurations = 16
+Group 4B-2 configurations = 32
+Group 4C density configurations = 48
+Group 4C worst-case configurations = 10
+Total reference and experiment rows = 108
+
+[FFT Work Proxies]
+Fair Dense Range FFT work = 2551241
+Fair Dense Doppler FFT work = 768000
+Fair Dense combined FFT work = 3319241
+
+[Balanced Weak-Target Comparison]
+Bins | Doppler FFTs 176 | Doppler reduction 91.20% | Combined FFT reduction 21.10% | CFAR CUT reduction 99.17%
+Blocks | Doppler FFTs 176 | Doppler reduction 91.20% | Combined FFT reduction 21.10% | CFAR CUT reduction 99.17%
+
+[Validation]
+Previous result files loaded = PASS
+Range FFT counters = PASS
+Doppler FFT workload counters = PASS
+CFAR training access counters = PASS
+FFT budget consistency = PASS
+Logical buffer size counters = PASS
+Logical data access counters = PASS
+Overall code validation = PASS
+
+[Important Limitations]
+FFT work uses N*log2(N), not measured CPU cycles.
+Combined FFT work does not include CFAR or AoA operations.
+Range FFT count excludes the original diagnostic duplicate FFT.
+CFAR accesses are logical training-cell reads, not measured DRAM traffic.
+Logical buffer sum is not measured peak RAM usage.
+Sparse processing buffers are modeled using selected range bins.
+Reported hit metrics differ across source experiments; do not aggregate them directly.
+AoA cost is excluded because per-scene grouped peak counts are not in the input CSV files.
+Original CFAR alpha was used in the Group 4 experiments.
+No actual CPU latency, energy or power reduction is claimed.

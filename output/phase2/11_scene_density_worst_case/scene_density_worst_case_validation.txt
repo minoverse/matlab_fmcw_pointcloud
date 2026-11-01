@@ -1,0 +1,46 @@
+=== Group 4C: Scene Density and Worst-Case Workload ===
+
+Target counts = 2, 4, 8, 16
+Independent trials per density = 3
+ROI threshold = 3.0 dB
+FFT caps = 100 and 200
+Real scene comparisons = 48
+Full-density worst-case comparisons = 10
+
+[Mean Workload, FFT Cap 200]
+Targets 2 | Bin FFT 177.33 | Block FFT 177.33 | Bin retention 100.00% | Block retention 100.00%
+Targets 4 | Bin FFT 184.00 | Block FFT 200.00 | Bin retention 50.00% | Block retention 50.00%
+Targets 8 | Bin FFT 184.00 | Block FFT 192.00 | Bin retention 25.00% | Block retention 25.00%
+Targets 16 | Bin FFT 184.00 | Block FFT 197.33 | Bin retention 12.50% | Block retention 12.50%
+
+[Full-Density Worst Case]
+Cap 0 | Method 1 | Selected bins 0 | Actual FFTs 0
+Cap 0 | Method 2 | Selected bins 0 | Actual FFTs 0
+Cap 100 | Method 1 | Selected bins 5 | Actual FFTs 100
+Cap 100 | Method 2 | Selected bins 0 | Actual FFTs 0
+Cap 200 | Method 1 | Selected bins 6 | Actual FFTs 184
+Cap 200 | Method 2 | Selected bins 0 | Actual FFTs 0
+Cap 400 | Method 1 | Selected bins 6 | Actual FFTs 344
+Cap 400 | Method 2 | Selected bins 0 | Actual FFTs 0
+Cap 2000 | Method 1 | Selected bins 500 | Actual FFTs 2000
+Cap 2000 | Method 2 | Selected bins 500 | Actual FFTs 2000
+
+[Validation]
+Actual Doppler FFT hard cap = PASS
+Dense FFT / CFAR / peak regression = PASS
+Multiple target-density scenarios = PASS
+Independent noise trials completed = PASS
+Zero-budget handling = PASS
+Full-budget handling = PASS
+Oversized atomic block handling = PASS
+Overall code validation = PASS
+
+[Limitations]
+Only 3 trials are used per target density.
+This is a workload stress test, not a final statistical Pd estimate.
+Top-K Blocks uses all-or-nothing candidate blocks.
+At full candidate density, a large block may be rejected by a small FFT cap.
+Matched target retention is relative to Dense CFAR detections.
+Synthetic targets do not model realistic clutter or multipath.
+FFT caps exclude Range FFT, CFAR, AoA and system overhead.
+Execution latency and peak memory are not measured.

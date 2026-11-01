@@ -1,0 +1,42 @@
+=== Group 5C: Statistical Validation ===
+
+Independent noise trials per SNR/amplitude scene = 200
+SNR values = 0, 10, 20, 30 dB
+Target 2 amplitudes = 0.03 and 0.005
+ROI thresholds = 2, 3, 4, 5, 6 dB
+CFAR alphas = 11.825273 and 4.800000
+Top-K Bins/Blocks limit = 6; FFT cap = 200
+Independent noise frames = 1600
+Statistical result rows = 320
+95% Wilson confidence intervals are computed per local-CFAR target hit rate.
+
+[Weak Target 0.005, SNR 20 dB, ROI 3 dB]
+Dense | Alpha 11.825 | Hit 100.0% | 95% CI [98.1, 100.0] | Mean FFT 2000.0 | Loss vs Dense 0.0%
+Dense | Alpha 4.800 | Hit 100.0% | 95% CI [98.1, 100.0] | Mean FFT 2000.0 | Loss vs Dense 0.0%
+Sparse ROI | Alpha 11.825 | Hit 100.0% | 95% CI [98.1, 100.0] | Mean FFT 177.0 | Loss vs Dense 0.0%
+Sparse ROI | Alpha 4.800 | Hit 100.0% | 95% CI [98.1, 100.0] | Mean FFT 177.0 | Loss vs Dense 0.0%
+Top-K Bins | Alpha 11.825 | Hit 100.0% | 95% CI [98.1, 100.0] | Mean FFT 177.0 | Loss vs Dense 0.0%
+Top-K Bins | Alpha 4.800 | Hit 100.0% | 95% CI [98.1, 100.0] | Mean FFT 177.0 | Loss vs Dense 0.0%
+Top-K Blocks | Alpha 11.825 | Hit 100.0% | 95% CI [98.1, 100.0] | Mean FFT 177.0 | Loss vs Dense 0.0%
+Top-K Blocks | Alpha 4.800 | Hit 100.0% | 95% CI [98.1, 100.0] | Mean FFT 177.0 | Loss vs Dense 0.0%
+
+[Validation]
+Independent Monte Carlo noise frames completed = PASS
+CFAR separable-vs-original kernel = PASS
+Paired threshold comparison = PASS
+Sparse target hits subset of Dense = PASS
+Top-K Bins/Blocks hard FFT cap = PASS
+Statistical interval computation = PASS
+200+ trials per SNR/amplitude scene = PASS
+Overall code validation = PASS
+
+[Limitations]
+Target hits are local CFAR detections within +/-1 range and Doppler bins.
+Hit rate can include accidental noise detections near ground truth.
+Selection methods restrict the same Dense CFAR decisions to selected CUTs.
+Sparse FFT/CFAR are not re-executed each trial; equivalence was tested in Groups 4B-2/4C.
+Counts are modeled from selected processing bins; no actual latency or energy measured.
+The nominal CFAR alpha and noise-only calibrated alpha are both tested.
+Only the specified synthetic two-target geometry and Gaussian noise are evaluated.
+Confidence intervals are binomial intervals under independent noise-trial assumptions.
+No PNG is generated. Completed scenes are saved to a MAT checkpoint.

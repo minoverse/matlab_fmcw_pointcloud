@@ -1,0 +1,30 @@
+=== Group 5B: Performance-Cost Tradeoff ===
+
+Paired scenario configurations = 32
+Source = Group 4B-2 detection results and Group 5A resource counters
+CFAR uses original alpha, not calibrated alpha
+
+[Weak Target: Amplitude 0.005, ROI 3 dB]
+Dense / Fair Dense | FFT 2000 | Total FFT reduction 0.00% | T2 hit 1/1 | Pareto 0
+Sparse ROI / Unbounded | FFT 176 | Total FFT reduction 21.10% | T2 hit 1/1 | Pareto 1
+Bins / Strict | FFT 92 | Total FFT reduction 22.07% | T2 hit 0/1 | Pareto 1
+Blocks / Strict | FFT 92 | Total FFT reduction 22.07% | T2 hit 0/1 | Pareto 1
+Bins / Balanced | FFT 176 | Total FFT reduction 21.10% | T2 hit 1/1 | Pareto 1
+Blocks / Balanced | FFT 176 | Total FFT reduction 21.10% | T2 hit 1/1 | Pareto 1
+Bins / Relaxed | FFT 176 | Total FFT reduction 21.10% | T2 hit 1/1 | Pareto 1
+Blocks / Relaxed | FFT 176 | Total FFT reduction 21.10% | T2 hit 1/1 | Pareto 1
+
+[Validation]
+Matched source rows = PASS
+Dense/Sparse paired-scene comparison = PASS
+Hard FFT budgets = PASS
+Pareto dominance comparison = PASS
+Overall code validation = PASS
+
+[Limitations]
+Each 4B-2 scene has one noise realization; hits are binary, not Pd estimates.
+Top-K limits count bins in Bins mode and source blocks in Blocks mode.
+Dense rows are paired references, not extra measured runs.
+FFT work is a mathematical proxy, not CPU cycles or execution time.
+Logical buffer sum and data access are not measured physical RAM or bus traffic.
+No PNG is generated to avoid MATLAB Online export failures.

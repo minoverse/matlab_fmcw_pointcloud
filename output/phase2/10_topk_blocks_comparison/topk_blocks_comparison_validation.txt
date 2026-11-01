@@ -1,0 +1,31 @@
+=== Group 4B-2: Top-K Bins vs Top-K Blocks ===
+
+Real scene configurations = 32
+CFAR range margin = 10
+Fair Dense FFTs = 2000
+CFAR alpha = 11.825273
+
+[Weak Target: Amplitude 0.005, ROI 3 dB]
+Strict | Cap 100 | Bin FFT 92, Hit 0 | Block FFT 92, Hit 0
+Balanced | Cap 200 | Bin FFT 176, Hit 1 | Block FFT 176, Hit 1
+Relaxed | Cap 400 | Bin FFT 176, Hit 1 | Block FFT 176, Hit 1
+Unbounded | Cap 2000 | Bin FFT 176, Hit 1 | Block FFT 176, Hit 1
+
+[Validation]
+Top-K Bins regression = PASS
+Top-K Blocks regression = PASS
+Hard FFT budget = PASS
+CFAR margin coverage = PASS
+Dense FFT / CFAR / peak regression = PASS
+Synthetic weak-target coverage test = PASS
+Oversized block handling = PASS
+Overall code validation = PASS
+
+[Limitations]
+Top-K counts different units for Bins and Blocks.
+Both methods share the same FFT cap.
+Block score is maximum candidate range energy.
+Block selection is greedy and does not guarantee target preservation.
+Source blocks are not split when they exceed the FFT budget.
+Each real scene uses one independent noise realization.
+FFT reduction is not a measured latency or power saving.
