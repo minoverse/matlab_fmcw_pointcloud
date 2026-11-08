@@ -78,9 +78,9 @@ phase2_group5d_main
 phase2_group5e_main
 ```
 
-## 5. Engineering Perspective
+## 5. 시스템 관점의 최적화
 
-Local Optimization ≠ System-Level Optimization
+Local 최적화 ≠ 시스템 Level 최적화
 
 - Dense Range FFT와 CFAR Margin 등 추가 처리 비용
 - 저 SNR 및 밀집 장면에서의 표적 누락
