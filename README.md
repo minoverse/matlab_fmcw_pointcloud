@@ -25,8 +25,7 @@ MATLAB 기반 FMCW 레이더 신호처리 파이프라인 구현 및 표적 후�
 | 데이터 접근량 모델 | 14.475 → 10.210 MiB (29.46% 감소) |
 | Dense / Sparse 추정값 | 공통 검출 표적에서 수치 일치 (PASS) |
 
-위 수치는 대표 검증 장면 기준. 전체 FFT 연산량은 ROI 관리 오버헤드 제외, 데이터 접근량은 양쪽에 동일한 Integral-Image CFAR 모델을 적용한 논리적 추정치.
-
+대표 검증 장면 기준. FFT 연산량은 추가 관리 비용 제외, 데이터 접근량은 모델 기반 추정치.
 ### 검출 성능과 실패 조건
 
 - SNR 20 dB, ROI 3 dB: Dense / Sparse 모두 60/60 검출
@@ -83,10 +82,9 @@ phase2_group5e_main
 
 Local Optimization ≠ System-Level Optimization
 
-- CFAR 검출에 필요한 ROI 확장 비용
-- 전체 FFT 연산량에서 Dense Range FFT가 차지하는 비중
+- Dense Range FFT와 CFAR Margin 등 추가 처리 비용
 - 저 SNR 및 밀집 장면에서의 표적 누락
-- 메모리 접근 모델의 공정성과 처리 예산의 한계
+- 메모리 접근 비용과 제한된 연산 예산
 
 핵심 원칙: 검출 성능과 자원 제약을 고려해 필요한 연산만 선택적으로 수행.
 
