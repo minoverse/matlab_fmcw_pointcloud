@@ -1,13 +1,42 @@
+function phase2_group5d_main()
 %% Phase 2 Group 5D - Fair CFAR Data Access Comparison
 % New validation only. Existing signal processing functions are unchanged.
 % Estimates logical accesses, not measured SRAM/DRAM traffic or latency.
 
-clear;
+% 함수의 지역 변수 범위가 자동으로 초기화됨
 clc;
 
-assert(isfile("config.m"),"Run from the project root");
+assert(isfile("src/config/radar_config.m"),"Run from the project root");
 addpath(genpath("src"));
-run("config.m");
+cfg = radar_config();
+c = cfg.c;
+fc = cfg.fc;
+B = cfg.B;
+Tchirp = cfg.Tchirp;
+fs = cfg.fs;
+Nchirp = cfg.Nchirp;
+target_range = cfg.target_range;
+target_velocity = cfg.target_velocity;
+target_angle = cfg.target_angle;
+target_elevation = cfg.target_elevation;
+target_amplitude = cfg.target_amplitude;
+Ntargets = cfg.Ntargets;
+S = cfg.S;
+Ns = cfg.Ns;
+range_resolution = cfg.range_resolution;
+tau = cfg.tau;
+fb = cfg.fb;
+lambda = cfg.lambda;
+fd = cfg.fd;
+Nrx_az = cfg.Nrx_az;
+Nrx_el = cfg.Nrx_el;
+Nrx = cfg.Nrx;
+d_az = cfg.d_az;
+d_el = cfg.d_el;
+rx_y = cfg.rx_y;
+rx_z = cfg.rx_z;
+NangleFFT_az = cfg.NangleFFT_az;
+NangleFFT_el = cfg.NangleFFT_el;
 
 %% Radar / CFAR settings
 half_N = floor(Ns/2);
@@ -185,6 +214,8 @@ fprintf("Results CSV: %s\n",csv_file);
 fprintf("Summary: %s\n",txt_file);
 
 %% Local rectangle-sum helper (1-based input rectangle coordinates)
+end
+
 function values = rect_sum(P,r1,r2,c1,c2)
     if isscalar(r1) && ~isscalar(c1)
         r1 = repmat(r1,size(c1));

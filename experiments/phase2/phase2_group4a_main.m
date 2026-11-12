@@ -1,9 +1,96 @@
+function phase2_group4a_main()
 
 %% Phase 2 Group 4A Main
 
 rng(1);
 
-run("phase2_main.m");
+base = phase2_main();
+cfg = base.cfg;
+c = base.c;
+fc = base.fc;
+B = base.B;
+Tchirp = base.Tchirp;
+fs = base.fs;
+Nchirp = base.Nchirp;
+Ns = base.Ns;
+half_N = base.half_N;
+S = base.S;
+lambda = base.lambda;
+Nrx = base.Nrx;
+Nrx_az = base.Nrx_az;
+Nrx_el = base.Nrx_el;
+d_az = base.d_az;
+d_el = base.d_el;
+rx_y = base.rx_y;
+rx_z = base.rx_z;
+NangleFFT_az = base.NangleFFT_az;
+NangleFFT_el = base.NangleFFT_el;
+target_range = base.target_range;
+target_velocity = base.target_velocity;
+target_angle = base.target_angle;
+target_elevation = base.target_elevation;
+target_amplitude = base.target_amplitude;
+Ntargets = base.Ntargets;
+range_resolution = base.range_resolution;
+tau = base.tau;
+fb = base.fb;
+fd = base.fd;
+Tr = base.Tr;
+Td = base.Td;
+Gr = base.Gr;
+Gd = base.Gd;
+Pfa = base.Pfa;
+snr_db = base.snr_db;
+adc_cube = base.adc_cube;
+t_fast = base.t_fast;
+range_data = base.range_data;
+range_axis = base.range_axis;
+range_data_no_window = base.range_data_no_window;
+roi_threshold_db = base.roi_threshold_db;
+roi = base.roi;
+range_positive = base.range_positive;
+range_energy = base.range_energy;
+roi_noise_floor = base.roi_noise_floor;
+roi_threshold = base.roi_threshold;
+roi_mask = base.roi_mask;
+roi_bins = base.roi_bins;
+roi_count = base.roi_count;
+roi_fraction = base.roi_fraction;
+target_roi_selected = base.target_roi_selected;
+apply_clutter_removal = base.apply_clutter_removal;
+range_data_for_doppler = base.range_data_for_doppler;
+range_doppler_rx = base.range_doppler_rx;
+RD_power = base.RD_power;
+velocity_axis = base.velocity_axis;
+RD_mag = base.RD_mag;
+RD_db = base.RD_db;
+cfar_map = base.cfar_map;
+noise_map = base.noise_map;
+det_range_idx = base.det_range_idx;
+det_doppler_idx = base.det_doppler_idx;
+cfar_stats = base.cfar_stats;
+Ntraining = base.Ntraining;
+alpha = base.alpha;
+total_cells = base.total_cells;
+guard_cells = base.guard_cells;
+peak_range_idx = base.peak_range_idx;
+peak_doppler_idx = base.peak_doppler_idx;
+peak_power = base.peak_power;
+Npeaks = base.Npeaks;
+estimated_azimuth = base.estimated_azimuth;
+estimated_elevation = base.estimated_elevation;
+estimated_snr = base.estimated_snr;
+data = base.data;
+cost = base.cost;
+range_fft_count = base.range_fft_count;
+range_fft_diagnostic_count = base.range_fft_diagnostic_count;
+doppler_fft_current = base.doppler_fft_current;
+doppler_fft_fair = base.doppler_fft_fair;
+doppler_fft_sparse = base.doppler_fft_sparse;
+projected_roi_reduction = base.projected_roi_reduction;
+cfar_cut_count = base.cfar_cut_count;
+cfar_training_accesses = base.cfar_training_accesses;
+
 
 addpath("tests");
 
@@ -26,12 +113,29 @@ active_range_bins = expanded_bins;
 
 sparse_RD_power = block_RD_power;
 
-run("roi_only_cfar.m");
+radar_roi = struct("half_N",half_N,"Nchirp",Nchirp,"Tr",Tr,"Td",Td,"Gr",Gr,"Gd",Gd,"Pfa",Pfa,"Ntraining",Ntraining);
+[roi_cfar_local, roi_noise_local, roi_peak_range_idx, roi_peak_doppler_idx, roi_cfar_cut_count, roi_stats, roi_det_range_idx, roi_det_doppler_idx, range_lookup] = roi_only_cfar_process(roi_bins, active_range_bins, sparse_RD_power, radar_roi);
+print_roi_only_cfar(roi_stats);
 
 
 %% Regression
 
-run("roi_block_regression.m");
+regression = roi_block_regression(roi_bins, active_range_bins, roi_cfar_local, roi_noise_local, roi_det_range_idx, roi_det_doppler_idx, roi_peak_range_idx, roi_peak_doppler_idx, roi_cfar_cut_count, range_lookup, half_N, Tr, Gr, expanded_bins, roi_blocks, range_doppler_rx, block_doppler_rx, RD_power, block_RD_power, cfar_map, noise_map, peak_range_idx, peak_doppler_idx, block_fft_count, Nrx, Nchirp, Td, Gd, range_data_for_doppler, apply_clutter_removal, Pfa, Ntraining);
+selected_cfar_cuts = regression.selected_cfar_cuts;
+selected_cfar_map = regression.selected_cfar_map;
+selected_noise_map = regression.selected_noise_map;
+selected_det_range_idx = regression.selected_det_range_idx;
+selected_det_doppler_idx = regression.selected_det_doppler_idx;
+selected_fft_error = regression.selected_fft_error;
+selected_power_error = regression.selected_power_error;
+selected_noise_error = regression.selected_noise_error;
+full_fft_error = regression.full_fft_error;
+full_power_error = regression.full_power_error;
+selected_roi_bins = regression.selected_roi_bins;
+selected_active_bins = regression.selected_active_bins;
+selected_peak_range_idx = regression.selected_peak_range_idx;
+selected_peak_doppler_idx = regression.selected_peak_doppler_idx;
+
 
 
 %% Workload Counters
@@ -264,3 +368,5 @@ fprintf("CSV saved: %s\n", csv_file);
 fprintf("PNG saved: %s\n", plot_file);
 fprintf("TXT saved: %s\n", txt_file);
 
+
+end

@@ -1,3 +1,4 @@
+function result = roi_block_regression(roi_bins, active_range_bins, roi_cfar_local, roi_noise_local, roi_det_range_idx, roi_det_doppler_idx, roi_peak_range_idx, roi_peak_doppler_idx, roi_cfar_cut_count, range_lookup, half_N, Tr, Gr, expanded_bins, roi_blocks, range_doppler_rx, block_doppler_rx, RD_power, block_RD_power, cfar_map, noise_map, peak_range_idx, peak_doppler_idx, block_fft_count, Nrx, Nchirp, Td, Gd, range_data_for_doppler, apply_clutter_removal, Pfa, Ntraining)
 
 %% Group 4A - ROI Block Regression
 
@@ -173,7 +174,9 @@ active_range_bins = full_bins;
 
 sparse_RD_power = full_power;
 
-run("roi_only_cfar.m");
+radar_roi = struct("half_N",half_N,"Nchirp",Nchirp,"Tr",Tr,"Td",Td,"Gr",Gr,"Gd",Gd,"Pfa",Pfa,"Ntraining",Ntraining);
+[roi_cfar_local, roi_noise_local, roi_peak_range_idx, roi_peak_doppler_idx, roi_cfar_cut_count, roi_stats, roi_det_range_idx, roi_det_doppler_idx, range_lookup] = roi_only_cfar_process(roi_bins, active_range_bins, sparse_RD_power, radar_roi);
+print_roi_only_cfar(roi_stats);
 
 assert(isequal(roi_cfar_local, cfar_map));
 assert(roi_cfar_cut_count == 25920);
@@ -228,3 +231,21 @@ fprintf("Full ROI CFAR / peak regression = PASS\n");
 
 fprintf("Group 4A regression = PASS\n");
 
+
+
+result = struct();
+result.selected_cfar_cuts = selected_cfar_cuts;
+result.selected_cfar_map = selected_cfar_map;
+result.selected_noise_map = selected_noise_map;
+result.selected_det_range_idx = selected_det_range_idx;
+result.selected_det_doppler_idx = selected_det_doppler_idx;
+result.selected_fft_error = selected_fft_error;
+result.selected_power_error = selected_power_error;
+result.selected_noise_error = selected_noise_error;
+result.full_fft_error = full_fft_error;
+result.full_power_error = full_power_error;
+result.selected_roi_bins = selected_roi_bins;
+result.selected_active_bins = selected_active_bins;
+result.selected_peak_range_idx = selected_peak_range_idx;
+result.selected_peak_doppler_idx = selected_peak_doppler_idx;
+end

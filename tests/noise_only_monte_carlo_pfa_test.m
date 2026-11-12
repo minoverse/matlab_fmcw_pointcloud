@@ -1,3 +1,35 @@
+function noise_only_monte_carlo_pfa_test()
+
+cfg = radar_config();
+c = cfg.c;
+fc = cfg.fc;
+B = cfg.B;
+Tchirp = cfg.Tchirp;
+fs = cfg.fs;
+Nchirp = cfg.Nchirp;
+target_range = cfg.target_range;
+target_velocity = cfg.target_velocity;
+target_angle = cfg.target_angle;
+target_elevation = cfg.target_elevation;
+target_amplitude = cfg.target_amplitude;
+Ntargets = cfg.Ntargets;
+S = cfg.S;
+Ns = cfg.Ns;
+range_resolution = cfg.range_resolution;
+tau = cfg.tau;
+fb = cfg.fb;
+lambda = cfg.lambda;
+fd = cfg.fd;
+Nrx_az = cfg.Nrx_az;
+Nrx_el = cfg.Nrx_el;
+Nrx = cfg.Nrx;
+d_az = cfg.d_az;
+d_el = cfg.d_el;
+rx_y = cfg.rx_y;
+rx_z = cfg.rx_z;
+NangleFFT_az = cfg.NangleFFT_az;
+NangleFFT_el = cfg.NangleFFT_el;
+
 
 %% Group 3C - Noise-Only Monte Carlo Pfa
 
@@ -258,11 +290,20 @@ for trial = 1:num_trials
 
             apply_clutter_removal = false;
 
-            run("roi_cfar_margin_selection.m");
+            roi_margin = roi_cfar_margin_selection_process(roi_bins, half_N, Tr, Gr);
+roi_range_margin = roi_margin.roi_range_margin;
+roi_margin_mask = roi_margin.roi_margin_mask;
+active_range_bins = roi_margin.active_range_bins;
+roi_processing_count = roi_margin.roi_processing_count;
+roi_extra_margin_bins = roi_margin.roi_extra_margin_bins;
+print_roi_cfar_margin_selection(roi_margin, half_N, Nrx);
 
-            run("selective_doppler_processing.m");
+            [sparse_range_doppler_rx, sparse_RD_power, sparse_fft_count, sparse_fft_work] = selective_doppler_processing_process(range_data_for_doppler, active_range_bins, half_N, Nchirp, Nrx, apply_clutter_removal);
+print_selective_doppler_processing(active_range_bins, half_N, sparse_fft_count, sparse_fft_work);
 
-            run("roi_only_cfar.m");
+            radar_roi = struct("half_N",half_N,"Nchirp",Nchirp,"Tr",Tr,"Td",Td,"Gr",Gr,"Gd",Gd,"Pfa",Pfa,"Ntraining",Ntraining);
+[roi_cfar_local, roi_noise_local, roi_peak_range_idx, roi_peak_doppler_idx, roi_cfar_cut_count, roi_stats, roi_det_range_idx, roi_det_doppler_idx, range_lookup] = roi_only_cfar_process(roi_bins, active_range_bins, sparse_RD_power, radar_roi);
+print_roi_only_cfar(roi_stats);
 
 
             %% Compare Doppler Power
@@ -576,3 +617,5 @@ fprintf("CSV saved: %s\n", csv_file);
 fprintf("Plot saved: %s\n", plot_file);
 
 fprintf("Summary saved: %s\n", txt_file);
+
+end

@@ -1,5 +1,5 @@
 
-function [adc_cube, t_fast] = simulate_adc_cube_process(cfg, snr_db)
+function [adc_cube, t_fast, noise] = simulate_adc_cube_process(cfg, snr_db)
 
 %% Fast-time axis
 

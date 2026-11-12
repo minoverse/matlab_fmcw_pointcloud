@@ -1,10 +1,11 @@
+function phase2_group5b_main()
 
 %% Phase 2 Group 5B - Performance vs Cost Comparison
 
-clear;
+% 함수의 지역 변수 범위가 자동으로 초기화됨
 clc;
 
-assert(isfile("config.m"), "Run from the project root");
+assert(isfile("src/config/radar_config.m"), "Run from the project root");
 
 resource_file = "output/phase2/12_unified_resource_counters/unified_resource_counters.csv";
 detection_file = "output/phase2/10_topk_blocks_comparison/topk_bins_vs_blocks_comparison.csv";
@@ -298,3 +299,5 @@ fprintf("Group 5B code validation passed.\n");
 fprintf("Results CSV: %s\n",results_csv);
 fprintf("Pareto CSV: %s\n",pareto_csv);
 fprintf("Summary: %s\n",summary_txt);
+
+end

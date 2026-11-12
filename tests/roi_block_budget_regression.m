@@ -1,3 +1,5 @@
+function roi_block_budget_regression(half_N,Nrx,Tr,Gr)
+
 
 %% Group 4B-2 - Block Selection Regression
 
@@ -104,3 +106,5 @@ fprintf("Full-budget handling = PASS\n");
 fprintf("Oversized block handling = PASS\n");
 fprintf("Group 4B-2 synthetic regression = PASS\n");
 
+
+end

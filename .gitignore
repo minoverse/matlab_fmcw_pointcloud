@@ -1,0 +1,6 @@
+
+# Local backups and checkpoints
+*.bak
+*.asv
+*.zip
+group5c_checkpoint.mat

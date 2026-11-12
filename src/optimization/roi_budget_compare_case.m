@@ -1,26 +1,20 @@
-
 function result = roi_budget_compare_case(method, candidate_bins, data, radar, top_k, fft_cap)
 
-    %% Parameters
+    %% Radar 파라미터
 
     half_N = radar.half_N;
     Nrx = radar.Nrx;
     Nchirp = radar.Nchirp;
 
     Tr = radar.Tr;
-    Td = radar.Td;
     Gr = radar.Gr;
-    Gd = radar.Gd;
 
-    Pfa = radar.Pfa;
-    Ntraining = radar.Ntraining;
-
-    margin = Tr+Gr;
+    margin = Tr + Gr;
 
     candidate_bins = unique(candidate_bins(:));
 
 
-    %% Select ROI Using One of Two Methods
+    %% ROI 선택 방식에 따른 처리
 
     if method == "Bins"
 
@@ -45,12 +39,12 @@ function result = roi_budget_compare_case(method, candidate_bins, data, radar, t
     end
 
 
-    %% Actual Block Doppler FFT
+    %% 선택된 Block에 Doppler FFT 수행
 
     [block_doppler_rx, block_RD_power, block_fft_count] = block_doppler_processing(data.range_data,processing_blocks,false);
 
 
-    %% Verify FFT Hard Cap
+    %% FFT Hard Cap 검증
 
     assert(selected_units <= top_k);
 
@@ -61,7 +55,7 @@ function result = roi_budget_compare_case(method, candidate_bins, data, radar, t
     assert(length(selected_bins)+length(dropped_bins) == length(candidate_bins));
 
 
-    %% Dense vs Block FFT Regression
+    %% Dense FFT와 Block FFT 결과 비교
 
     if ~isempty(expanded_bins)
 
@@ -85,7 +79,7 @@ function result = roi_budget_compare_case(method, candidate_bins, data, radar, t
     end
 
 
-    %% ROI-Only CFAR
+    %% 선택된 ROI에만 CA-CFAR 수행
 
     roi_bins = selected_bins;
 
@@ -93,10 +87,12 @@ function result = roi_budget_compare_case(method, candidate_bins, data, radar, t
 
     sparse_RD_power = block_RD_power;
 
-    run("roi_only_cfar.m");
+    [roi_cfar_local, roi_noise_local, roi_peak_range_idx, roi_peak_doppler_idx, roi_cfar_cut_count, roi_stats] = roi_only_cfar_process(roi_bins, active_range_bins, sparse_RD_power, radar);
+
+    print_roi_only_cfar(roi_stats);
 
 
-    %% Dense vs Sparse CFAR Regression
+    %% Dense CFAR와 Sparse CFAR 결과 비교
 
     expected_cfar = data.cfar_map(roi_bins,:);
 
@@ -115,7 +111,7 @@ function result = roi_budget_compare_case(method, candidate_bins, data, radar, t
     end
 
 
-    %% Dense vs Sparse Peak Regression
+    %% Dense Peak와 Sparse Peak 결과 비교
 
     [dense_local_r,dense_local_d] = find(expected_cfar);
 
@@ -145,7 +141,7 @@ function result = roi_budget_compare_case(method, candidate_bins, data, radar, t
     assert(isequal(sortrows(expected_peaks),sortrows(sparse_peaks)));
 
 
-    %% Target Detection Comparison
+    %% 실제 Target 검출 결과 비교
 
     bounded_map = false(half_N,Nchirp);
 
@@ -175,7 +171,7 @@ function result = roi_budget_compare_case(method, candidate_bins, data, radar, t
     end
 
 
-    %% Return Measurements
+    %% ROI Budget 비교 결과 반환
 
     result.method = method;
 
