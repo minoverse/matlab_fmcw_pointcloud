@@ -1,7 +1,6 @@
 # FMCW Radar DSP with Detection-Centric Sparse Processing
-
-핵심 목표:
--FMCW radar DSP 전체 파이프라인을 직접 구현·검증한 뒤, lightweight pre-filtering / candidate gating으로 불필요한 downstream processing을 조기에 제거하고, 연산량·메모리·데이터 이동량을 줄여 embedded real-time 환경에 적합하게 최적화
+FMCW Radar DSP 파이프라인 구현 및 검출 중심의 희소 처리(Sparse Processing) 최적화.
+핵심 목표: 검출 성능을 고려한 연산량 및 메모리 접근 비용 절감.
 - 절감률과 검출 성능 손실의 trade-off 분석
 
 ---
@@ -44,19 +43,7 @@ Point Cloud
 CSV / Text
 ```
 
-현재 단계:
 
-Multiple Targets + Noise        ✅
-Range FFT + Hann Windowing      ✅
-Doppler FFT                     ✅
-2D CA-CFAR + Peak Grouping      ✅
-Static / DC Handling            ✅
-1TX × 4RX AoA                   ✅
-Point Cloud + CSV               ✅
-Ground-Truth Validation         ✅
-Basic Robustness Tests          ✅
-Near-Zero Velocity Trade-Off    ✅
-Optimization v2                 ← NEXT
 
 ---
 
