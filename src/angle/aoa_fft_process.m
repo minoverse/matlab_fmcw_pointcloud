@@ -1,7 +1,5 @@
 
-function [estimated_azimuth, estimated_elevation, estimated_snr] = ...
-    aoa_fft_process(range_doppler_rx, RD_power, noise_map, ...
-                    peak_range_idx, peak_doppler_idx, cfg)
+function [estimated_azimuth, estimated_elevation, estimated_snr] = aoa_fft_process(range_doppler_rx, RD_power, noise_map, peak_range_idx, peak_doppler_idx, cfg)
 
     %% 결과 배열 초기화
 
@@ -14,15 +12,13 @@ function [estimated_azimuth, estimated_elevation, estimated_snr] = ...
 
     %% 공간 주파수 축 계산
 
-    u_az_axis = (-cfg.NangleFFT_az/2:cfg.NangleFFT_az/2-1) ...
-        * cfg.lambda / (cfg.NangleFFT_az * cfg.d_az);
+    u_az_axis = (-cfg.NangleFFT_az/2:cfg.NangleFFT_az/2-1) * cfg.lambda / (cfg.NangleFFT_az * cfg.d_az);
 
-    u_el_axis = (-cfg.NangleFFT_el/2:cfg.NangleFFT_el/2-1) ...
-        * cfg.lambda / (cfg.NangleFFT_el * cfg.d_el);
+    u_el_axis = (-cfg.NangleFFT_el/2:cfg.NangleFFT_el/2-1) * cfg.lambda / (cfg.NangleFFT_el * cfg.d_el);
 
     [u_az_grid, u_el_grid] = meshgrid(u_az_axis, u_el_axis);
 
-    % 물리적으로 가능한 방향만 선택 
+    % 물리적으로 가능한 방향만 선택
     physical_mask = u_az_grid.^2 + u_el_grid.^2 <= 1;
 
 
