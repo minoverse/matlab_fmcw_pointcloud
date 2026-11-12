@@ -1,7 +1,7 @@
 
 function [selected_bins, selected_source_blocks, processing_blocks, expanded_bins, dropped_bins, source_blocks] = roi_block_budget_selection(candidate_bins, range_energy, half_N, margin, max_blocks, max_fft_count, Nrx)
 
-    %% Input Validation
+    %% 입력값 검증
 
     candidate_bins = unique(candidate_bins(:));
     range_energy = range_energy(:);
@@ -14,7 +14,7 @@ function [selected_bins, selected_source_blocks, processing_blocks, expanded_bin
     assert(Nrx > 0);
 
 
-    %% Merge Adjacent Candidate Bins Into Source Blocks
+    %% 인접한 후보 Bin을 Source Block으로 병합
 
     [source_blocks, ~] = roi_merge_blocks(candidate_bins, half_N, 0);
 
@@ -32,14 +32,14 @@ function [selected_bins, selected_source_blocks, processing_blocks, expanded_bin
     end
 
 
-    %% Rank Blocks by Peak Energy
+    %% 최대 에너지 기준으로 Block 우선순위 정렬
 
     ranking = [-block_scores, source_blocks(:,1)];
 
     [~, order] = sortrows(ranking, [1 2]);
 
 
-    %% Hard-Budget Block Selection
+    %% 연산량 제한을 적용한 Block 선택
 
     selected_block_mask = false(num_blocks, 1);
 
@@ -84,7 +84,7 @@ function [selected_bins, selected_source_blocks, processing_blocks, expanded_bin
     end
 
 
-    %% Build Selected ROI and Processing Blocks
+    %% 선택된 ROI 및 Processing Block 구성
 
     selected_bins = find(selected_bin_mask);
 
@@ -95,7 +95,7 @@ function [selected_bins, selected_source_blocks, processing_blocks, expanded_bin
     dropped_bins = setdiff(candidate_bins, selected_bins);
 
 
-    %% Validation
+    %% 연산량 제한 및 선택 결과 검증
 
     assert(size(selected_source_blocks,1) <= max_blocks);
 
