@@ -1,14 +1,43 @@
+function phase2_group5e_main()
 %% Phase 2 Group 5E - Dense vs Actual Sparse Range/Velocity/AoA RMSE
 % Uses the same ADC scene for both paths; no figures or exportgraphics.
 % The existing roi_only_cfar.m uses original alpha approximately 11.825, NOT 4.8.
 % Reports both matched conditional RMSE and missed targets.
 
-clear;
+% 함수의 지역 변수 범위가 자동으로 초기화됨
 clc;
 
-assert(isfile("config.m"),"Run from the project root");
+assert(isfile("src/config/radar_config.m"),"Run from the project root");
 addpath(genpath("src"));
-run("config.m");
+cfg = radar_config();
+c = cfg.c;
+fc = cfg.fc;
+B = cfg.B;
+Tchirp = cfg.Tchirp;
+fs = cfg.fs;
+Nchirp = cfg.Nchirp;
+target_range = cfg.target_range;
+target_velocity = cfg.target_velocity;
+target_angle = cfg.target_angle;
+target_elevation = cfg.target_elevation;
+target_amplitude = cfg.target_amplitude;
+Ntargets = cfg.Ntargets;
+S = cfg.S;
+Ns = cfg.Ns;
+range_resolution = cfg.range_resolution;
+tau = cfg.tau;
+fb = cfg.fb;
+lambda = cfg.lambda;
+fd = cfg.fd;
+Nrx_az = cfg.Nrx_az;
+Nrx_el = cfg.Nrx_el;
+Nrx = cfg.Nrx;
+d_az = cfg.d_az;
+d_el = cfg.d_el;
+rx_y = cfg.rx_y;
+rx_z = cfg.rx_z;
+NangleFFT_az = cfg.NangleFFT_az;
+NangleFFT_el = cfg.NangleFFT_el;
 assert(Ntargets==2,"Group 5E uses the existing two-target geometry");
 
 %% Experiment configuration
@@ -97,7 +126,8 @@ for s = 1:num_scenes
         %% Actual ROI-only CFAR; original alpha from the repository
         roi_bins = selected_bins;
         active_range_bins = expanded_bins;
-        evalc('run("roi_only_cfar.m");');
+        radar_roi = struct("half_N",half_N,"Nchirp",Nchirp,"Tr",Tr,"Td",Td,"Gr",Gr,"Gd",Gd,"Pfa",Pfa,"Ntraining",Ntraining);
+        [roi_cfar_local, roi_noise_local, roi_peak_range_idx, roi_peak_doppler_idx, roi_cfar_cut_count, roi_stats, roi_det_range_idx, roi_det_doppler_idx, range_lookup] = roi_only_cfar_process(roi_bins, active_range_bins, sparse_RD_power, radar_roi);
         assert(isequal(roi_cfar_local,data.cfar_map(selected_bins,:)));
 
         %% Dense local peak grouping (same 3x3 criterion)
@@ -291,6 +321,8 @@ fprintf("Results CSV: %s\n",csv_file);
 fprintf("Summary: %s\n",txt_file);
 
 %% Local helper: strongest unused grouped peak within +/-1 bin
+end
+
 function [index,used] = match_peak(peaks,used,true_r,true_d,power_map)
     index = 0;
     best_power = -inf;

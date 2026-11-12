@@ -1,3 +1,5 @@
+function [stress_rows,stress_candidate_counts,stress_fft_caps] = roi_budget_regression(half_N,Nrx,Tr,Gr)
+
 
 %% Group 4B - Synthetic Workload Stress Test
 
@@ -140,3 +142,5 @@ fprintf("Zero-budget handling = PASS\n");
 fprintf("Full-budget handling = PASS\n");
 fprintf("Synthetic workload stress test = PASS\n");
 
+
+end

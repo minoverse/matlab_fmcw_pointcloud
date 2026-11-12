@@ -1,7 +1,6 @@
-
 function data = roi_budget_scene_data(target_ranges, target_velocities, target_amplitudes, radar)
 
-    %% Scene Settings
+    %% 실험 Scene 설정
 
     target_ranges = target_ranges(:);
     target_velocities = target_velocities(:);
@@ -14,7 +13,7 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
     assert(num_targets > 0);
 
 
-    %% ADC Signal Generation
+    %% ADC 신호 생성
 
     adc_cube = complex(zeros(radar.Ns, radar.Nrx, radar.Nchirp));
 
@@ -34,7 +33,7 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
         base_signal = fast_wave * slow_wave;
 
 
-        %% RX Spatial Phase
+        %% RX 채널별 공간 위상 계산
 
         if k == 1
             azimuth = 15;
@@ -63,7 +62,7 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
     end
 
 
-    %% Complex Gaussian Noise
+    %% 복소 Gaussian Noise 추가
 
     noise_power = max(target_amplitudes)^2 / 10^(radar.snr_db/10);
 
@@ -72,7 +71,7 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
     adc_cube = adc_cube + noise;
 
 
-    %% Range FFT
+    %% Range FFT 수행
 
     n_range = (0:radar.Ns-1)';
 
@@ -83,14 +82,14 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
     range_data = fft(adc_windowed,[],1);
 
 
-    %% Range Energy
+    %% 비동기 합산 방식의 Range Energy 계산
 
     range_positive = range_data(1:radar.half_N,:,:);
 
     range_energy = squeeze(sum(sum(abs(range_positive).^2,3),2));
 
 
-    %% Dense Positive-Range Doppler FFT
+    %% 전체 Positive Range Bin에 Doppler FFT 적용
 
     n_doppler = (0:radar.Nchirp-1)';
 
@@ -105,7 +104,7 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
     RD_power = reshape(sum(abs(dense_fft).^2,2),radar.half_N,radar.Nchirp);
 
 
-    %% Dense CA-CFAR
+    %% Dense CA-CFAR 파라미터
 
     Tr = radar.Tr;
     Td = radar.Td;
@@ -125,6 +124,9 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
 
     alpha = Ntraining * (radar.Pfa^(-1/Ntraining)-1);
 
+
+    %% Dense CA-CFAR Noise 및 Detection Map 계산
+
     training_sum = conv2(RD_power,cfar_kernel,"same");
 
     noise_map = zeros(radar.half_N,radar.Nchirp);
@@ -140,7 +142,7 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
     cfar_map(valid_range,valid_doppler) = RD_power(valid_range,valid_doppler) > alpha*noise_map(valid_range,valid_doppler);
 
 
-    %% Ground Truth Axes
+    %% Ground Truth 비교용 Range 및 Velocity 축 생성
 
     range_axis = radar.c*(0:radar.half_N-1)*radar.fs/(2*radar.S*radar.Ns);
 
@@ -149,7 +151,7 @@ function data = roi_budget_scene_data(target_ranges, target_velocities, target_a
     velocity_axis = (-radar.Nchirp/2:radar.Nchirp/2-1)*PRF*radar.lambda/(2*radar.Nchirp);
 
 
-    %% Return Data
+    %% 결과 구조체 반환
 
     data.range_data = range_data;
     data.dense_fft = dense_fft;

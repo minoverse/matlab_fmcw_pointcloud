@@ -1,5 +1,39 @@
+function cfar_calibrated_detection_test()
+
+cfg = radar_config();
+c = cfg.c;
+fc = cfg.fc;
+B = cfg.B;
+Tchirp = cfg.Tchirp;
+fs = cfg.fs;
+Nchirp = cfg.Nchirp;
+target_range = cfg.target_range;
+target_velocity = cfg.target_velocity;
+target_angle = cfg.target_angle;
+target_elevation = cfg.target_elevation;
+target_amplitude = cfg.target_amplitude;
+Ntargets = cfg.Ntargets;
+S = cfg.S;
+Ns = cfg.Ns;
+range_resolution = cfg.range_resolution;
+tau = cfg.tau;
+fb = cfg.fb;
+lambda = cfg.lambda;
+fd = cfg.fd;
+Nrx_az = cfg.Nrx_az;
+Nrx_el = cfg.Nrx_el;
+Nrx = cfg.Nrx;
+d_az = cfg.d_az;
+d_el = cfg.d_el;
+rx_y = cfg.rx_y;
+rx_z = cfg.rx_z;
+NangleFFT_az = cfg.NangleFFT_az;
+NangleFFT_el = cfg.NangleFFT_el;
+
 
 %% Group 3D - Calibrated CFAR Detection Validation
+
+snr_db = 20;
 
 %% Experiment Settings
 
@@ -119,11 +153,13 @@ for scene = 1:num_scenes
 
     %% Generate Clean Target Signal
 
-    run("simulate_adc_cube.m");
+    cfg_scene = radar_config();
+cfg_scene.target_amplitude = target_amplitude;
+[adc_cube, t_fast, noise] = simulate_adc_cube_process(cfg_scene, 20);
 
     clean_adc_cube = adc_cube - noise;
 
-    close(gcf);
+    % ADC Simulation process does not create a figure
 
 
     %% Ground Truth Matching Regions
@@ -324,7 +360,8 @@ for scene = 1:num_scenes
 
                 active_range_bins = expanded_bins;
 
-                run("selective_doppler_processing.m");
+                [sparse_range_doppler_rx, sparse_RD_power, sparse_fft_count, sparse_fft_work] = selective_doppler_processing_process(range_data_for_doppler, active_range_bins, half_N, Nchirp, Nrx, apply_clutter_removal);
+print_selective_doppler_processing(active_range_bins, half_N, sparse_fft_count, sparse_fft_work);
 
                 dense_selected = dense_doppler_cube(active_range_bins,:,:);
 
@@ -519,7 +556,17 @@ legend("Location","best");
 
 plot_file = fullfile(output_dir, "calibrated_cfar_weak_target_tradeoff.png");
 
-exportgraphics(fig, plot_file, "Resolution", 300);
+plot_saved = false;
+try
+    drawnow;
+    assert(isgraphics(fig, "figure"), "Figure is invalid or closed");
+    frame = getframe(fig);
+    assert(~isempty(frame.cdata), "Captured frame is empty");
+    imwrite(frame.cdata, plot_file);
+    plot_saved = isfile(plot_file);
+catch ME
+    warning("PNG capture failed: %s", ME.message);
+end
 
 
 %% Save TXT Summary
@@ -605,5 +652,11 @@ fprintf("Calibrated alpha detection monotonicity = PASS\n");
 fprintf("Group 3D code validation passed.\n");
 
 fprintf("CSV saved: %s\n", csv_file);
-fprintf("Plot saved: %s\n", plot_file);
+if plot_saved
+    fprintf("Plot saved: %s\n", plot_file);
+else
+    fprintf("Plot: NOT SAVED (graphics issue)\n");
+end
 fprintf("TXT saved: %s\n", txt_file);
+
+end

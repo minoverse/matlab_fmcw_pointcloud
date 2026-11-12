@@ -1,10 +1,43 @@
+function roi_threshold_miss_rate_test()
+
+cfg = radar_config();
+c = cfg.c;
+fc = cfg.fc;
+B = cfg.B;
+Tchirp = cfg.Tchirp;
+fs = cfg.fs;
+Nchirp = cfg.Nchirp;
+target_range = cfg.target_range;
+target_velocity = cfg.target_velocity;
+target_angle = cfg.target_angle;
+target_elevation = cfg.target_elevation;
+target_amplitude = cfg.target_amplitude;
+Ntargets = cfg.Ntargets;
+S = cfg.S;
+Ns = cfg.Ns;
+range_resolution = cfg.range_resolution;
+tau = cfg.tau;
+fb = cfg.fb;
+lambda = cfg.lambda;
+fd = cfg.fd;
+Nrx_az = cfg.Nrx_az;
+Nrx_el = cfg.Nrx_el;
+Nrx = cfg.Nrx;
+d_az = cfg.d_az;
+d_el = cfg.d_el;
+rx_y = cfg.rx_y;
+rx_z = cfg.rx_z;
+NangleFFT_az = cfg.NangleFFT_az;
+NangleFFT_el = cfg.NangleFFT_el;
+
 
 %% Group 3B - ROI Threshold Sweep and Miss-Rate Test
+
+snr_db = 20;
 
 %% Experiment Settings
 
 threshold_values = [0, 3, 6, 9, 12];
-
 target2_amplitudes = [0.7, 0.03, 0.005];
 
 num_trials = 30;
@@ -108,13 +141,15 @@ for scene = 1:num_scenes
 
     target_amplitude(2) = target2_amplitudes(scene);
 
-    %% Generate Clean Target Signal Using Existing Simulator
+    %% Generate Clean Target Signal
 
-    run("simulate_adc_cube.m");
+    cfg_scene = radar_config();
+cfg_scene.target_amplitude = target_amplitude;
+[adc_cube, t_fast, noise] = simulate_adc_cube_process(cfg_scene, 20);
 
     clean_adc_cube = adc_cube - noise;
 
-    close(gcf);
+    % ADC Simulation process does not create a figure
 
     noise_power = max(target_amplitude)^2 / (10^(snr_db / 10));
 
@@ -150,7 +185,7 @@ for scene = 1:num_scenes
         RD_power = reshape(sum(abs(dense_doppler_cube).^2, 2), half_N, Nchirp);
 
 
-        %% Local Dense CFAR Near Each Ground-Truth Target
+        %% Local Dense CFAR Near Ground Truth
 
         dense_target_ranges = cell(Ntargets, 1);
         target_range_bins = zeros(Ntargets, 1);
@@ -281,7 +316,7 @@ for scene = 1:num_scenes
             end
 
 
-            %% One Actual Selective FFT Regression
+            %% Actual Selective FFT Regression
 
             if scene == 1 && trial == 1 && threshold_db == 6 && ~isempty(expanded_bins)
 
@@ -291,7 +326,8 @@ for scene = 1:num_scenes
 
                 apply_clutter_removal = false;
 
-                run("selective_doppler_processing.m");
+                [sparse_range_doppler_rx, sparse_RD_power, sparse_fft_count, sparse_fft_work] = selective_doppler_processing_process(range_data_for_doppler, active_range_bins, half_N, Nchirp, Nrx, apply_clutter_removal);
+print_selective_doppler_processing(active_range_bins, half_N, sparse_fft_count, sparse_fft_work);
 
                 dense_selected = dense_doppler_cube(active_range_bins, :, :);
 
@@ -433,25 +469,19 @@ for scene = 1:num_scenes
 
     scene_name = sprintf("Target 2 amp = %.3f", target2_amplitudes(scene));
 
-
     subplot(3, 1, 1);
-
     hold on;
 
     plot(threshold_values, squeeze(roi_miss_pct(scene,:,2)), "-o", "DisplayName", scene_name);
 
-
     subplot(3, 1, 2);
-
     hold on;
 
     plot(threshold_values, squeeze(sparse_hit_pct(scene,:,2)), "-o", "DisplayName", "Sparse " + scene_name);
 
     plot(threshold_values, dense_hit_pct(scene,2) * ones(1,num_thresholds), "--", "DisplayName", "Dense " + scene_name);
 
-
     subplot(3, 1, 3);
-
     hold on;
 
     plot(threshold_values, fft_reduction_pct(scene,:), "-o", "DisplayName", scene_name);
@@ -495,10 +525,20 @@ grid on;
 legend("Location", "best");
 
 
+%% Save PNG
 plot_file = fullfile(output_dir, "roi_threshold_miss_rate_vs_doppler_workload.png");
 
-exportgraphics(fig, plot_file, "Resolution", 300);
-
+plot_saved = false;
+try
+    drawnow;
+    assert(isgraphics(fig, "figure"), "Figure is invalid or closed");
+    frame = getframe(fig);
+    assert(~isempty(frame.cdata), "Captured frame is empty");
+    imwrite(frame.cdata, plot_file);
+    plot_saved = isfile(plot_file);
+catch ME
+    warning("PNG capture failed: %s", ME.message);
+end
 
 %% Save Text Summary
 
@@ -541,6 +581,14 @@ fprintf(file, "Selective FFT spot-check = PASS\n");
 fprintf(file, "Workload counter bounds = PASS\n");
 fprintf(file, "Overall = PASS\n");
 
+fprintf(file, "\n[Plot Export]\n");
+
+if plot_saved
+    fprintf(file, "PNG = SAVED\n");
+else
+    fprintf(file, "PNG = FAILED (graphics export issue)\n");
+end
+
 fprintf(file, "\n[Limitations]\n");
 fprintf(file, "Target hit is evaluated on local CFAR CUTs near ground truth.\n");
 fprintf(file, "Peak grouping and AoA are not part of the Monte Carlo hit metric.\n");
@@ -557,19 +605,23 @@ fclose(file);
 fprintf("\n--- Group 3B Validation ---\n");
 
 fprintf("Trials per scene = %d\n", num_trials);
-
 fprintf("Scene count = %d\n", num_scenes);
 
 fprintf("Threshold monotonicity = PASS\n");
-
 fprintf("Sparse target-hit subset of Dense = PASS\n");
-
 fprintf("Selective FFT spot-check = PASS\n");
-
 fprintf("Workload counter bounds = PASS\n");
 
 fprintf("Group 3B validation passed.\n");
 
 fprintf("CSV saved: %s\n", csv_file);
-fprintf("Plot saved: %s\n", plot_file);
+
+if plot_saved
+    fprintf("Plot saved: %s\n", plot_file);
+else
+    fprintf("Plot export failed; numerical validation passed.\n");
+end
+
 fprintf("Summary saved: %s\n", txt_file);
+
+end

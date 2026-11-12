@@ -1,3 +1,4 @@
+function result = roi_cfar_regression(range_doppler_rx, active_range_bins, sparse_range_doppler_rx, RD_power, sparse_RD_power, cfar_map, roi_bins, roi_cfar_local, noise_map, roi_noise_local, peak_range_idx, peak_doppler_idx, roi_peak_range_idx, roi_peak_doppler_idx)
 
 %% ROI CFAR Regression
 
@@ -87,3 +88,15 @@ fprintf("CFAR noise match = %d\n", noise_match);
 fprintf("Peak grouping match = %d\n", peak_match);
 
 fprintf("ROI CFAR regression = PASS\n");
+
+
+result = struct();
+result.fft_difference = fft_difference;
+result.power_difference = power_difference;
+result.noise_difference = noise_difference;
+result.fft_match = fft_match;
+result.power_match = power_match;
+result.cfar_match = cfar_match;
+result.noise_match = noise_match;
+result.peak_match = peak_match;
+end
