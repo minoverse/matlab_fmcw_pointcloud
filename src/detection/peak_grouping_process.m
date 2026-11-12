@@ -1,6 +1,5 @@
 
-function [peak_range_idx, peak_doppler_idx, peak_power] = ...
-    peak_grouping_process(RD_power, det_range_idx, det_doppler_idx)
+function [peak_range_idx, peak_doppler_idx, peak_power] = peak_grouping_process(RD_power, det_range_idx, det_doppler_idx)
 
 %% Initialize peaks
 peak_range_idx = [];
