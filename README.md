@@ -1,741 +1,203 @@
 # FMCW Radar DSP with Detection-Centric Sparse Processing
+
+## 1. 프로젝트 개요
+
 FMCW Radar DSP 파이프라인 구현 및 검출 중심의 희소 처리(Sparse Processing) 최적화.
-핵심 목표: 검출 성능을 고려한 연산량 및 메모리 접근 비용 절감.
-- 절감률과 검출 성능 손실의 trade-off 분석
 
----
+**핵심 목표:** 검출 성능을 고려한 연산량 및 메모리 접근 비용 절감.
 
-## 1. 전체 구조
+## 2. 처리 구조
 
 ```text
-Multiple Targets + Noise
-        ↓
-ADC Cube
-        ↓
-Range Window
-        ↓
-Range FFT
-        ↓
-Static / DC Handling
-        ↓
-Doppler Window
-        ↓
-Doppler FFT
-        ↓
-Range-Doppler Map
-        ↓
-2D CA-CFAR
-        ↓
-Peak Grouping
-        ↓
-Detection List
-        ↓
-1TX × 4RX ULA
-        ↓
-AoA / Angle FFT
-        ↓
-Range + Velocity + Angle + SNR
-        ↓
-x, y, vr, SNR
-        ↓
-Point Cloud
-        ↓
-CSV / Text
+ADC Cube (Fast Time × RX × Slow Time)
+                ↓
+         Dense Range FFT
+                ↓
+        ROI Candidate Selection
+                ↓
+        Top-K / FFT Budget
+                ↓
+       CFAR Training / Guard Margin
+                ↓
+       Selective Doppler FFT
+                ↓
+           ROI-Only CFAR
+                ↓
+           Peak Grouping
+                ↓
+         2D Angle FFT / AoA
+                ↓
+          3D Point Cloud
+                ↓
+              CSV
 ```
 
+### Radar Configuration
 
+| Parameter | Value |
+|---|---:|
+| Carrier Frequency | 77 GHz |
+| Bandwidth | 1 GHz |
+| Chirp Duration | 50 μs |
+| Sampling Frequency | 20 MHz |
+| Samples per Chirp | 1,000 |
+| Chirps per Frame | 64 |
+| RX Array | 4 RX (2×2 Planar) |
+| Range Resolution | 0.15 m |
+| Nominal Pfa | 10⁻⁵ |
 
----
+## 3. 최적화 구조
 
-## 2. ADC Cube
-
-```text
-adc_cube(sample, rx, chirp)
-```
-
-```text
-dim 1 → Fast Time
-dim 2 → RX Channel
-dim 3 → Slow Time / Chirps
-```
-
-처리 방향:
-
-```text
-Fast Time   → Range FFT    → Range
-Slow Time   → Doppler FFT  → Velocity
-RX Channels → Angle FFT    → Angle
-```
-
----
-
-## 3. Baseline Signal Model
-
-Synthetic data:
-
-- Multiple targets
-- Range
-- Radial velocity
-- Amplitude
-- Angle
-- Complex Gaussian noise
-
-추가 검증 조건:
-
-- Weak targets
-- Close-range targets
-- Close-velocity targets
-- Close-angle targets
-- Static clutter
-- Near-zero velocity targets
-- RX gain / phase mismatch
-- SNR sweep
-
----
-
-## 4. Range / Doppler Processing
-
-### Range
+### ROI Candidate Selection
 
 ```text
-ADC
- ↓
-Hann Window
- ↓
-Range FFT
- ↓
-Range Spectrum
-```
-
-검증:
-
-- Range resolution
-- Ground Truth Range
-- Estimated Range
-- Range Error
-
-Range FFT는 Baseline과 Optimization v2 모두 **dense processing**으로 유지.
-
-### Doppler
-
-```text
-Range FFT Output
-        ↓
-Doppler Window
-        ↓
-Doppler FFT
-        ↓
-fftshift
-        ↓
-Range-Doppler Map
-```
-
-검증:
-
-- Velocity resolution
-- Maximum unambiguous velocity
-- Ground Truth Velocity
-- Estimated Velocity
-- Velocity Error
-
----
-
-## 5. Static / DC Handling
-
-Strong static clutter가 ROI selection을 방해할 수 있으므로 Slow-Time mean subtraction을 비교 실험.
-
-```text
-Range Data
-    ↓
-Slow-Time Mean
-    ↓
-Mean Subtraction
-```
-
-주의:
-
-```text
-v ≈ 0 target
-Stopped vehicle
-Guardrail
-Tangential motion
-```
-
-도 함께 억제될 수 있음.
-
-따라서:
-
-```text
-With Clutter Removal
-vs
-Without Clutter Removal
-```
-
-을 비교.
-
-Static removal은 항상 적용하는 전처리가 아니라 **trade-off 항목**으로 처리.
-
----
-
-## 6. 2D CA-CFAR + Peak Grouping
-
-```text
-Training Cells
-      +
-Guard Cells
-      +
-CUT
+Range Energy
       ↓
-Noise Estimate
+Median Noise Floor
       ↓
-Threshold
+Adaptive Threshold
       ↓
-Detection
-```
-
-CFAR output:
-
-```text
-Range Bin
-Doppler Bin
-Detection Power
-```
-
-한 target이 여러 cell로 검출될 수 있으므로:
-
-```text
-CFAR Detections
-        ↓
-Local Peak
-        ↓
-Peak Grouping
-        ↓
-Detection List
-```
-
----
-
-## 7. 1TX × 4RX AoA
-
-Baseline:
-
-```text
-1 TX
-×
-4 RX ULA
-```
-
-Target angle에 따라 RX antenna 사이에 spatial phase progression 발생.
-
-```text
-RX1
-RX2
-RX3
-RX4
- ↓
-Spatial Phase Difference
- ↓
-Angle FFT
- ↓
-Azimuth Estimate
-```
-
-검증:
-
-- Ground Truth Angle
-- Estimated Angle
-- Angle Error
-- Close-angle target separation
-
----
-
-## 8. Point Cloud
-
-각 detection에서:
-
-```text
-Range
-Velocity
-Angle
-SNR
-```
-
-추정.
-
-좌표계:
-
-```text
-x → Forward
-y → Lateral
-```
-
-```text
-Range + Angle
-      ↓
-Cartesian Conversion
-      ↓
-x, y
-```
-
-최종 Point Cloud:
-
-```text
-x
-y
-range
-radial_velocity
-angle
-SNR
-```
-
----
-
-## 9. Baseline Validation
-
-Optimization 전에 Baseline 정확성을 먼저 확인.
-
-### 이론값
-
-- Range resolution
-- Velocity resolution
-- Maximum unambiguous velocity
-- FFT bin spacing
-
-### Ground Truth
-
-- Range Error
-- Velocity Error
-- Angle Error
-
-### Robustness
-
-- Weak targets
-- Multiple targets
-- Close targets
-- Static clutter
-- Near-zero velocity
-- RX mismatch
-- SNR sweep
-
----
-
-# Optimization v2
-
-## 10. Embedded Sparse DSP Optimization
-```text
-Dense Range Processing
-        ↓
-Lightweight Early Gating
-        ↓
-Candidate Range Bins
-        ↓
-Selective Downstream Processing
-        ↓
-Sparse Point Cloud
-```
-```text
-목표:
-
-Unnecessary Processing ↓
-Compute ↓
-Memory Footprint ↓
-Data Movement ↓
-```
-동시에:
-
-Detection Performance 유지
-Weak-Target Miss 최소화
-Range / Velocity / Angle Accuracy 유지
-
-## 11. Optimization Architecture
-
-```text
-Range FFT                    ← Dense
-    ↓
-Static / DC Handling
-    ↓
-Adaptive ROI Selection
-    ↓
-Candidate Range Bins
-    ↓
-Selective Doppler FFT
-    ↓
-ROI-Only CFAR
-    ↓
-Peak Grouping
-    ↓
-Detection List
-    ↓
-Detection-Based AoA
-    ↓
-Sparse Point Cloud
-```
-
-주요 절감 대상:
-
-- Doppler FFT
-- CFAR processing
-- Buffer usage
-- Data movement
-- Output data size
-
----
-
-## 12. ROI Candidate Selection
-
-Range FFT 이후 low-cost candidate 생성.
-
-```text
-Range FFT
-    ↓
-Static / DC Handling
-    ↓
-Noncoherent Energy
-    ↓
-Noise Floor Estimate
-    ↓
-Median × Scale
-    ↓
 Candidate Range Bins
 ```
 
-ROI threshold는 conservative하게 설정.
+Doppler FFT 이전에 후보 Range Bin을 선택하여 불필요한 후속 연산 감소.
 
-이유:
-
-```text
-Pre-Doppler ROI
-→ Doppler integration gain 없음
-→ Weak target miss 가능
-```
-
-핵심 평가:
-
-```text
-Processing Reduction
-        vs
-Missed Target Rate
-```
-
-절감률이 작더라도 weak target을 유지하는 것이 우선.
-
----
-
-## 13. Selective Doppler + ROI CFAR
-
-### Baseline
-
-```text
-All Range Bins
-      ↓
-Doppler FFT
-      ↓
-Full CFAR Search
-```
-
-### Sparse
+### Selective Doppler FFT & ROI CFAR
 
 ```text
 Candidate Range Bins
+        ↓
+Training / Guard Margin
         ↓
 Selective Doppler FFT
         ↓
 ROI-Only CFAR
 ```
 
-CFAR ROI는 edge detection을 위해:
+선택된 ROI와 CFAR 계산에 필요한 주변 영역만 처리.
+
+### Bounded Workload
+
+- Top-K Bin / Block Selection
+- Doppler FFT 연산량 상한 설정
+- 표적 밀도 증가 및 최악 조건에서의 처리 비용 검증
+
+## 4. 주요 검증 결과
+
+### 연산량 비교
+
+Balanced Sparse 설정: 약한 표적 진폭 0.005, ROI Threshold 3 dB.
+
+| 항목 | Dense | Sparse | 절감률 |
+|---|---:|---:|---:|
+| Doppler FFT Count | 2,000 | 176 | 91.20% |
+| CFAR CUT Count | 25,920 | 216 | 99.17% |
+| Combined FFT Work | 100% | 78.90% | 21.10% |
+
+- Combined FFT Work: Range FFT와 Doppler FFT의 N log₂N 연산량 모델
+- 동일 Integral-Image CFAR 모델 기준 논리적 데이터 접근량 절감: 29.46%
+
+### Dense / Sparse Doppler 비교
+
+![Dense vs Sparse Doppler](output/phase2/02_selective_doppler_regression/dense_vs_selective_doppler_rd_map.png)
+
+### 검출 성능 비교
+
+실제 Sparse FFT 및 ROI CFAR를 적용한 검증 결과.
+
+| 조건 | Dense Hits | Sparse Hits |
+|---|---:|---:|
+| SNR 20 dB / ROI 3 dB | 60/60 | 60/60 |
+| SNR 20 dB / ROI 6 dB | 60/60 | 30/60 |
+| SNR 10 dB / ROI 3 dB | 30/60 | 30/60 |
+
+- 공통 검출 표적의 거리·속도·각도 추정값 차이: 0
+- 높은 ROI Threshold에서 약한 표적의 검출 손실 발생
+- 4-RX CFAR 보정 후 독립 검증 Pfa: 1.003086 × 10⁻⁵
+
+### ROI Threshold Trade-off
+
+![ROI Threshold Trade-off](output/phase2/04_roi_threshold_sweep_miss_rate/roi_threshold_miss_rate_vs_doppler_workload.png)
+
+### Top-K 연산량 제한
+
+![Top-K Workload](output/phase2/09_topk_bounded_workload/topk_budget_and_weak_target_tradeoff.png)
+
+<details>
+<summary>추가 검증 그래프</summary>
+
+### ROI Candidate Selection
+
+![ROI Selection](output/phase2/01_baseline_roi_gating/pre_doppler_roi_energy_threshold_6dB.png)
+
+### ROI CFAR Training Margin
+
+![CFAR Margin](output/phase2/03_roi_cfar_training_margin/roi_cfar_margin_and_detections.png)
+
+### Noise-Only Pfa
+
+![Noise-Only Pfa](output/phase2/05_noise_only_monte_carlo_pfa/noise_only_pfa_vs_roi_threshold.png)
+
+### CFAR Calibration
+
+![CFAR Calibration](output/phase2/06_cfar_pfa_calibration/cfar_pfa_calibration_and_holdout_validation.png)
+
+### Weak Target Detection
+
+![Weak Target](output/phase2/07_calibrated_cfar_detection_validation/calibrated_cfar_weak_target_tradeoff.png)
+
+### ROI Block Processing
+
+![ROI Blocks](output/phase2/08_roi_merge_block_processing/merged_roi_blocks_and_cfar_regression.png)
+
+### Top-K Bin / Block 비교
+
+![Bin vs Block](output/phase2/10_topk_blocks_comparison/topk_bins_vs_blocks_tradeoff.png)
+
+</details>
+
+**모듈화 및 기존 Script 제거 후 전체 Regression: 16/16 PASS**
+
+상세 검증 결과: [`output/phase2/`](output/phase2/)
+
+## 5. Repository Structure
 
 ```text
-Candidate ROI
-      ↓
-Training + Guard Margin
-      ↓
-ROI-Only CFAR
+matlab_fmcw_pointcloud/
+├── main.m
+├── run_radar_pipeline.m
+├── phase2_main.m
+├── run_phase2.m
+├── run_phase2_regression_suite.m
+├── src/
+│   ├── config/
+│   ├── simulation/
+│   ├── processing/
+│   ├── detection/
+│   ├── angle/
+│   ├── optimization/
+│   └── output/
+├── experiments/phase2/
+├── tests/
+├── output/
+└── plots/
 ```
 
-으로 확장.
+DSP 처리 모듈, 최적화 실험 및 검증 코드 분리.
 
-Margin cell도 실제 processing cost에 포함.
+## 6. 기술적 고려사항
 
----
+- 개별 처리 단계의 최적화와 전체 파이프라인의 연산량 절감 구분
+- 약한 표적의 검출 손실과 연산량 간 균형
+- 표적 밀도 증가에 따른 최대 연산량 제한
 
-## 14. Fair Comparison
+**검증 범위:** MATLAB 시뮬레이션 기반 검출 성능, 연산량 및 논리적 메모리 접근 비용 분석.
 
-### Dense Reference
-
-```text
-Full Range
-→ Full Doppler
-→ Dense Downstream
-```
-
-### Practical Baseline
-
-```text
-Full Range FFT
-→ Full Doppler FFT
-→ Full CFAR
-→ Detection List
-→ AoA
-→ Point Cloud
-```
-
-### Sparse Optimization
-
-```text
-Full Range FFT
-→ ROI Selection
-→ Selective Doppler FFT
-→ ROI-Only CFAR
-→ Detection List
-→ AoA
-→ Sparse Point Cloud
-```
-
-실제 핵심 비교:
-
-```text
-Practical Baseline
-        vs
-Sparse Optimization
-```
-
-Detection-based AoA 자체는 Optimization 성과로 과장하지 않음.
-
----
-
-## 15. 평가 지표
-
-### Radar Performance
-
-```text
-Pd
-Pfa
-Missed Target Rate
-Range RMSE
-Velocity RMSE
-Angle RMSE
-```
-
-### Processing Cost
-
-```text
-Selected Range Bins
-Doppler FFT Count
-CFAR CUT Count
-Operation Count
-Buffer Size
-Estimated Bytes Moved
-Output Data Size
-```
-
-Pfa는 단일 frame이 아니라 noise-only Monte Carlo로 측정.
-
-```text
-Noise-Only Frames
-      ↓
-Repeated CFAR
-      ↓
-False Detections / Tested CUTs
-      ↓
-Measured Pfa
-```
-
----
-
-## 16. Worst-Case / Reliability
-
-Sparse processing은 scene이 sparse할수록 유리.
-
-```text
-More Targets / Clutter
-        ↓
-More ROI Bins
-        ↓
-More Doppler FFT
-        ↓
-More CFAR Processing
-        ↓
-Higher Workload
-```
-
-따라서:
-
-```text
-Typical Case
-vs
-Worst Case
-```
-
-를 함께 측정.
-
-핵심 관점:
-
-> 평균 연산량뿐 아니라 scene이 복잡해졌을 때 workload upper bound도 확인.
-
----
-
-## 17. 핵심 Trade-offs
-
-### Static Removal
-
-```text
-Clutter 제거 ↑
-Near-zero target sensitivity ↓
-```
-
-### ROI Threshold
-
-```text
-Low Threshold
-→ Miss ↓
-→ Saving ↓
-
-High Threshold
-→ Saving ↑
-→ Miss ↑
-```
-
-### ROI-CFAR
-
-```text
-Smaller ROI
-→ CFAR Cost ↓
-
-Training + Guard Margin
-→ 실제 Saving 감소
-```
-
-### Hardware
-
-Algorithmic operation 감소가 실제 power / latency 감소와 동일하지는 않음.
-
-현재 평가는:
-
-```text
-Operations
-Processed Cells
-Memory
-Estimated Data Movement
-```
-
-중심.
-
----
-
-## 18. Optional — Fixed-Point
-
-```text
-Floating Point
-      ↓
-8 / 12 / 16-bit
-      ↓
-Quantization
-      ↓
-FFT Scaling
-      ↓
-Overflow / Saturation
-```
-
-비교:
-
-- Memory
-- Quantization noise
-- SNR loss
-- Pd
-- RMSE
-- Overflow
-
----
-
-## 19. Advanced Extension — 3TX × 4RX TDM-MIMO
-
-Sparse Optimization과 별도 확장.
-
-```text
-1TX × 4RX
-      ↓
-3TX × 4RX TDM-MIMO
-      ↓
-TX Sequencing
-      ↓
-Virtual Antenna Geometry
-      ↓
-Doppler Compensation
-      ↓
-AoA
-      ↓
-Gain / Phase Mismatch
-      ↓
-Calibration
-```
-
-주요 관심:
-
-- Virtual array
-- TDM Doppler compensation
-- Channel mismatch
-- Calibration
-- AoA workload scaling
-
----
-
-## 20. Main Contribution
-
-```text
-Radar DSP
-+
-Compute-on-Demand
-+
-Event-Driven Thinking
-+
-Memory Awareness
-+
-Data Movement Awareness
-+
-Worst-Case Reliability
-```
-
-핵심 질문:
-
-> **유용한 Radar 정보를 잃기 시작하기 전까지 processing을 얼마나 줄일 수 있는가?**
-
-Synthetic data에서 먼저 검증하고, 이후 real radar data에서 동일한 경계를 다시 확인.
-
----
+실제 Radar ADC 데이터, 하드웨어 지연시간, 최대 메모리 사용량, 물리적 데이터 전송량 및 전력 소비는 미측정.
 
 ## References
 
-### Texas Instruments
-
-- TI mmWave SDK  
-  https://www.ti.com/tool/MMWAVE-SDK
-
-- TI mmWave MCU+ SDK  
-  https://www.ti.com/tool/MMWAVE-MCUPLUS-SDK
-
-- TI mmWave-L-SDK  
-  https://www.ti.com/tool/MMWAVE-L-SDK
-
-- TI AWR1843  
-  https://www.ti.com/product/AWR1843
-
-- TI AWR1843 Datasheet  
-  https://www.ti.com/lit/ds/symlink/awr1843.pdf
-
-### MathWorks
-
-- Range-Doppler Response  
-  https://www.mathworks.com/help/phased/ug/range-doppler-response.html
-
-- Range and Doppler Estimation  
-  https://www.mathworks.com/help/phased/range-doppler-estimation.html
-
-- 2-D CFAR Detector  
-  https://www.mathworks.com/help/phased/ref/phased.cfardetector2d-system-object.html
-
----
-
-
-→ Optimization v2
-```
+- [TI mmWave SDK](https://www.ti.com/tool/MMWAVE-SDK)
+- [TI AWR1843](https://www.ti.com/product/AWR1843)
+- [MathWorks Range-Doppler Response](https://www.mathworks.com/help/phased/ug/range-doppler-response.html)
+- [MathWorks 2D CFAR Detector](https://www.mathworks.com/help/phased/ref/phased.cfardetector2d-system-object.html)
