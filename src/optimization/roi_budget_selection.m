@@ -1,7 +1,7 @@
 
 function [selected_bins, blocks, expanded_bins, dropped_bins] = roi_budget_selection(candidate_bins, range_energy, half_N, margin, max_rois, max_fft_count, Nrx)
 
-%% Input Validation
+%% 입력값 검증
 
 candidate_bins = unique(candidate_bins(:));
 range_energy = range_energy(:);
@@ -14,7 +14,7 @@ assert(max_fft_count >= 0 && max_fft_count == floor(max_fft_count));
 assert(Nrx > 0);
 
 
-%% Rank Candidates by Range Energy
+%% Range Energy 기준으로 후보 Bin 우선순위 정렬
 
 if isempty(candidate_bins)
 
@@ -36,7 +36,7 @@ ranking = [-scores, candidate_bins];
 ranked_bins = candidate_bins(order);
 
 
-%% Greedy Selection With Hard FFT Budget
+%% FFT 연산량 제한을 적용한 Greedy 선택
 
 selected_bins = zeros(0,1);
 
@@ -70,7 +70,7 @@ for i = 1:length(ranked_bins)
 end
 
 
-%% Merge Selected ROI Into Contiguous Blocks
+%% 선택된 ROI를 연속된 Block으로 병합
 
 selected_bins = sort(selected_bins);
 
@@ -79,7 +79,7 @@ selected_bins = sort(selected_bins);
 dropped_bins = setdiff(candidate_bins, selected_bins);
 
 
-%% Final Hard-Cap Validation
+%% 최종 연산량 제한 및 선택 결과 검증
 
 actual_ffts = length(expanded_bins) * Nrx;
 
