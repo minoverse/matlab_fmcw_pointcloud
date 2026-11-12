@@ -160,30 +160,44 @@ Balanced Sparse 설정: 약한 표적 진폭 0.005, ROI Threshold 3 dB.
 
 상세 검증 결과: [`output/phase2/`](output/phase2/)
 
+
 ## 5. Repository Structure
 
 ```text
 matlab_fmcw_pointcloud/
-├── main.m
-├── run_radar_pipeline.m
-├── phase2_main.m
-├── run_phase2.m
-├── run_phase2_regression_suite.m
-├── src/
-│   ├── config/
-│   ├── simulation/
-│   ├── processing/
-│   ├── detection/
-│   ├── angle/
-│   ├── optimization/
-│   └── output/
-├── experiments/phase2/
-├── tests/
-├── output/
-└── plots/
+│
+├── main.m                          # 기본 Radar DSP 파이프라인 실행
+├── run_radar_pipeline.m            # 전체 DSP 처리 모듈 연결 및 실행
+├── phase2_main.m                   # Dense Baseline 및 ROI 최적화 기준 설정
+├── run_phase2.m                    # 개별 Phase 2 실험 실행
+├── run_phase2_regression_suite.m   # 전체 16개 실험 회귀 검증
+├── check_legacy_dependencies.m     # 기존 Script 호출 의존성 검사
+│
+├── src/                            # 핵심 DSP 처리 모듈
+│   ├── config/                     # Radar 파라미터 및 시스템 설정
+│   ├── simulation/                 # 다중 표적 및 잡음 기반 ADC Cube 생성
+│   ├── processing/                 # Range FFT, Doppler FFT, Static Clutter 처리
+│   ├── detection/                  # 2D CA-CFAR 검출 및 Peak Grouping
+│   ├── angle/                      # 2D Angle FFT 기반 방위각 및 고각 추정
+│   ├── optimization/               # ROI 선택, Sparse Processing, 연산량 제한
+│   └── output/                     # 3D Point Cloud 생성, 시각화 및 결과 저장
+│
+├── experiments/
+│   └── phase2/                     # 최적화 및 성능 분석 실험 15개
+│
+├── tests/                          # 알고리즘 정확성 및 Dense/Sparse 동등성 검증
+│
+├── output/                         # CSV 및 정량적 검증 결과
+│   └── phase2/                     # 최적화 단계별 그래프 및 분석 결과
+│
+├── plots/                          # 기본 DSP 파이프라인 시각화 결과
+├── REFACTOR_VALIDATION.md          # 모듈화 변경 사항 및 검증 기록
+└── README.md                       # 프로젝트 구조 및 주요 결과
 ```
 
-DSP 처리 모듈, 최적화 실험 및 검증 코드 분리.
+핵심 DSP 처리 모듈과 실험·검증 코드 분리.
+각 처리 단계의 독립적인 수정, 검증 및 확장이 가능한 구조로 구성.
+
 
 ## 6. 기술적 고려사항
 
