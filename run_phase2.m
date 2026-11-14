@@ -1,6 +1,6 @@
 function run_phase2(group)
 
-%% 프로젝트 루트 설정
+%% 프로젝트 루트 
 
 root = fileparts(mfilename("fullpath"));
 cd(root);
@@ -16,7 +16,7 @@ exp_dir = fullfile(root, "experiments", "phase2");
 addpath(exp_dir);
 
 
-%% 실행할 test 선택
+%% test 선택
 
 if string(group) == "base"
 
@@ -30,7 +30,6 @@ else
 
     assert(isfile(script_file), "Experiment not found");
 
-    % 동일한 이름의 다른 스크립트 실행 방지
     assert(strcmp(which(char(script_name)), char(script_file)));
 
     feval(char(script_name));
