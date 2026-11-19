@@ -8,7 +8,7 @@ FMCW Radar DSP 파이프라인 구현 및 검출 중심의 희소 처리(Sparse 
 
 ### 주요 결과 요약
 
-**조건:** MATLAB 기반 2표적 시뮬레이션, SNR 20 dB, 약한 표적 진폭 0.005, ROI 임계값 3 dB.
+**조건:** MATLAB 기반 2표적 시뮬레이션(정적 클러터 미포함), SNR 20 dB, 약한 표적 진폭 0.005, ROI 임계값 3 dB.
 - **연산량:** Balanced 설정(Top-K 6, FFT 상한 200)에서 Doppler FFT 2,000 → 176회(**91.2% 절감**), Range+Doppler FFT 연산량 모델 기준 **21.1% 절감**.
 - **데이터 접근:** 동일한 Integral-Image CFAR 비용 모델 기준 논리적 데이터 접근량 **29.46% 절감**.
 - **검출 성능:** 별도 30회 독립 잡음 시험에서 Dense/Sparse 모두 **60/60 표적 매칭**(Range/Doppler ±1 Bin 기준). ROI 임계값 6 dB에서는 Sparse **30/60**으로 감소.
@@ -124,7 +124,8 @@ Balanced Sparse 설정: 약한 표적 진폭 0.005, ROI Threshold 3 dB.
 
 - 공통 검출 표적의 거리·속도·각도 추정값 차이: 0
 - 높은 ROI Threshold에서 약한 표적의 검출 손실 발생
-- 4-RX CFAR 보정 후 독립 검증 Pfa: 1.003086 × 10⁻⁵
+- **CFAR 계수 구분:** 위 Dense/Sparse 검출 성능 비교는 기존 계수(α ≈ 11.825) 사용
+- **별도 Pfa 검증:** 4-RX 보정 계수(α = 4.8) 적용 시 독립 검증 Pfa = 1.003086 × 10⁻⁵.
 
 ### ROI Threshold Trade-off
 
@@ -182,7 +183,6 @@ matlab_fmcw_pointcloud/
 ├── phase2_main.m                   # Dense Baseline 및 ROI 최적화 기준 설정
 ├── run_phase2.m                    # 개별 Phase 2 실험 실행
 ├── run_phase2_regression_suite.m   # 전체 16개 실험 회귀 검증
-├── check_legacy_dependencies.m     # 기존 Script 호출 의존성 검사
 │
 ├── src/                            # 핵심 DSP 처리 모듈
 │   ├── config/                     # Radar 파라미터 및 시스템 설정
@@ -202,7 +202,6 @@ matlab_fmcw_pointcloud/
 │   └── phase2/                     # 최적화 단계별 그래프 및 분석 결과
 │
 ├── plots/                          # 기본 DSP 파이프라인 시각화 결과
-├── REFACTOR_VALIDATION.md          # 모듈화 변경 사항 및 검증 기록
 └── README.md                       # 프로젝트 구조 및 주요 결과
 ```
 
